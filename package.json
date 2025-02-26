@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "main": "index.ts",
     "scripts": {
-        "start": "webpack serve --mode development"
+        "start": "webpack serve --mode development",
+        "build": "yarn install && webpack build --mode production"
     },
     "dependencies": {
         "css-loader": "^7.1.2",
