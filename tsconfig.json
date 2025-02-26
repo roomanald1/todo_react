@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "target": "ES2022",
+        "lib": ["ES2022", "DOM"],
+        "rootDir": ".",
+        "baseUrl": ".",
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "esModuleInterop": true
+    },
+    "exclude": [
+        "node_modules", "tmp"
+    ]
+}
