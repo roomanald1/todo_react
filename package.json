@@ -7,12 +7,17 @@
         "build": "yarn install && webpack build --mode production"
     },
     "dependencies": {
+        "@react-oauth/google": "^0.12.1",
         "css-loader": "^7.1.2",
+        "jwt-decode": "^4.0.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+        "react-spinners": "^0.15.0",
+        "rxjs": "^7.8.2",
         "style-loader": "^4.0.0",
         "ts-loader": "^9.5.2",
         "typescript": "^5.7.3",
+        "typescript-cookie": "^1.0.6",
         "webpack": "^5.98.0"
     },
     "devDependencies": {
