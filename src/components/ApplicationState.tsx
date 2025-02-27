@@ -1,6 +1,6 @@
 import { BehaviorSubject, buffer, bufferTime, bufferWhen, filter, flatMap, interval, map, never, tap, timer } from "rxjs";
 import { Filter } from "./Filter";
-import { getCookie, setCookie } from "typescript-cookie";
+import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 
 
 export type Delta = AddDelta | MarkDelta | DeleteDelta | undefined;
@@ -23,6 +23,10 @@ export type DeleteDelta = {
 }
 
 export class ApplicationState {
+    logout() {
+        removeCookie('user');
+        this.setUser(undefined);
+    }
     private readonly baseUrl = "https://todo-okla.onrender.com";
 
     private userSub = new BehaviorSubject<any>(undefined);
