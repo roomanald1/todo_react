@@ -21,9 +21,9 @@ export const Filter = () => {
                          borderRadius: 3, 
                          border: "1px solid #49a09d",
                      }} onChange={(e: any) => appContext.setFilter(e.target.value)}>
-                     <label><input type="radio" value="all" name="viewMode" defaultChecked={viewMode === "all"}></input>ALL</label>
-                     <label><input type="radio" value="completed" name="viewMode" defaultChecked={viewMode === "completed"} ></input>DONE</label>
-                     <label><input type="radio" value="open" name="viewMode" defaultChecked={viewMode === "open"}></input>OPEN</label>
+                     <div><label><input type="radio" value="all" name="viewMode" defaultChecked={viewMode === "all"}></input>ALL</label></div>
+                     <div><label><input type="radio" value="completed" name="viewMode" defaultChecked={viewMode === "completed"} ></input>DONE</label></div>
+                     <div> <label><input type="radio" value="open" name="viewMode" defaultChecked={viewMode === "open"}></input>OPEN</label></div>
                  </div>
             }} isOpen={open} onClickOutside={() => setOpen(false)}>
                 <button onClick={() => setOpen(prev => !prev)}>
