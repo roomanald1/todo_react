@@ -37,9 +37,13 @@ export class ApplicationState {
 
     constructor() {
 
-        const fromCookie = getCookie('user');
-        if (fromCookie){
-            this.userSub.next(JSON.parse(fromCookie));
+        try{
+            const fromCookie = getCookie('user');
+            if (fromCookie){
+                this.userSub.next(JSON.parse(fromCookie));
+            }
+        }catch(e){
+            console.log(e);
         }
 
         this.pendingActions
