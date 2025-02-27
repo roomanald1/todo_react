@@ -5,15 +5,15 @@ import { ApplicationContext } from "./ApplicationContext";
 
 
 export const Add = () => {
-    const [value, setValue] = useState("");
+    const [value, setValue] = useState<string| undefined>(undefined);
     const appContext = useContext(ApplicationContext);
     return (
-        <div>
-            <h3>Add Item</h3>
-            <input type="text" placeholder="Description" onChange={(e) => setValue(e.target.value)} />
-            <button onClick={() => {
+        <div style={{display: "flex", margin: 10}}>
+            <input style={{flex: 1}} type="text" placeholder="Description" onChange={(e) => setValue(e.target.value)} />
+            <button style={{width: "100px"}} onClick={() => {
+                if (!value) return;
                 appContext.addItem(value);
-                setValue("");
+                setValue(undefined);
             }}>Add</button>
         </div>
     );

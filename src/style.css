@@ -9,9 +9,24 @@ body {
   background:linear-gradient(45deg, #49a09d, #5f2c82);
   font-family: sans-serif;
   font-weight: 100;
+  font-size: 1em;
   color: white;
   
 }
+
+.spin {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from {
+    transform: scale(1) rotate(0deg)
+  }
+  from {
+    transform: scale(1) rotate(360deg)
+  }
+}
+
 
 .container {
   position: absolute;
@@ -36,8 +51,7 @@ button {
 }
 
 table {
-    margin: 20px;
-  width: 800px;
+  margin: 10px;
   background: linear-gradient(45deg, #49a09d, #5f2c82);
   border-collapse: collapse;
   overflow: hidden;
@@ -46,7 +60,6 @@ table {
 
 input[type="radio"] {
     margin: 0;
-  
     font: inherit;
     color: currentColor;
     width: 1.15em;

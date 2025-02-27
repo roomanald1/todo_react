@@ -33,7 +33,10 @@ export class ApplicationState {
 
     constructor() {
 
-        this.userSub.next(getCookie('user'));
+        const fromCookie = getCookie('user');
+        if (fromCookie){
+            this.userSub.next(JSON.parse(fromCookie));
+        }
 
         this.pendingActions
         .pipe(
@@ -162,5 +165,9 @@ export class ApplicationState {
         const r = await fetch(this.baseUrl + `/api/items/${id}/${value}`, { method: "PUT", headers: { 'Content-Type': 'application/json' }, body: `"${id}"` });
         const result = await r.text();
         console.log(result);
+    }
+
+    refresh(){
+        this.fetchItems();
     }
 }

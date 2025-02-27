@@ -6,8 +6,7 @@ import { Login } from './components/Login';
 import { ApplicationContext } from "./components/ApplicationContext";
 import { useObservable } from "./components/useObservable";
 import { ApplicationState } from "./components/ApplicationState";
-import React, { useMemo } from 'react';
-import { getCookie, setCookie } from 'typescript-cookie';
+import { useMemo } from 'react';
 import { map } from 'rxjs';
 
 const clientId = "679057157657-p3do263k151dc2e813mjeloejetgjshv.apps.googleusercontent.com"
