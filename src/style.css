@@ -1,6 +1,6 @@
 html,
 body {
-  height: 100vh;
+  height: -webkit-fill-available;
   width: 100vw;
   font-family: sans-serif;
   font-weight: 100;
