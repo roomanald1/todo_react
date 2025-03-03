@@ -14,9 +14,9 @@ export const App = () => {
 
     const user = useObservable(appContext.getUser$(), undefined)
     return (
-        <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
+        <div style={{display: "flex", flexDirection: "column", height: "100%", padding: 10, boxSizing: "border-box"}}>
            
-            <div style={{display: "flex", margin: 10}}>
+            <div style={{display: "flex"}}>
                 <button onClick={() => {
                     googleLogout();
                     appContext.logout();
@@ -24,8 +24,8 @@ export const App = () => {
                 <div style={{flex: 1}}/>
                 <Filter/>
             </div>
-            <h1>{user?.given_name}'s TODOs</h1>
-            <div style={{display: "flex", margin: 10}}>
+            <h1 style={{textAlign: "center"}}>{user?.given_name}'s TODOs</h1>
+            <div style={{display: "flex", marginBottom: 10}}>
                 <div style={{flex: 1}}/>
                 <button onClick={() => appContext.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
             </div>
@@ -33,21 +33,21 @@ export const App = () => {
                 <table >
                 <thead>
                     <tr>
-                        <th style={{width: "10%", overflow: "auto"}}>Done</th>
-                        <th style={{width: "30%", overflow: "auto"}}>Description</th>
-                        <th  style={{width: "10%", overflow: "auto"}}></th>
+                        <th style={{width: "15%", overflow: "auto"}}>Done</th>
+                        <th style={{width: "80%", overflow: "auto"}}>Description</th>
+                        <th  style={{width: "15%", overflow: "auto"}}></th>
                     </tr>
                 </thead>
                 <tbody>
                     {items?.map(item => 
                         <tr className={item.completed ? "completed": "open"} key={item.id}>
-                            <td style={{width: "10%", overflow: "auto"}}>
+                            <td style={{width: "15%", overflow: "auto"}}>
                                 <button onClick={() => appContext.toggleStatus(item.completed, item.id)}>
                                 {item.completed === true ? <FaCheck/> : <FaCircle/>}
                                 </button>
                             </td>
-                            <td style={{width: "30%", overflow: "auto"}}>{item.description}</td>                          
-                            <td style={{width: "10%", overflow: "auto"}}><button onClick={() => appContext.deleteItem(item.id)}>X</button></td>
+                            <td style={{width: "80%", overflow: "auto"}}>{item.description}</td>                          
+                            <td style={{width: "15%", overflow: "auto"}}><button onClick={() => appContext.deleteItem(item.id)}>X</button></td>
                         </tr>
                     )}
                 </tbody>

@@ -17,9 +17,9 @@ export const Filter = () => {
             <Popover containerClassName="popover-root" reposition={false} positions={['bottom', 'left']} content={() => {
                  return <div style={
                      {
-                         background:"rgba(255,255,255,0.2)", 
+                         background:"linear-gradient(45deg, black, #461a63)",
                          borderRadius: 3, 
-                         border: "1px solid #49a09d",
+                         border:"1px solid #602c82c8"
                      }} onChange={(e: any) => appContext.setFilter(e.target.value)}>
                      <div><label><input type="radio" value="all" name="viewMode" defaultChecked={viewMode === "all"}></input>ALL</label></div>
                      <div><label><input type="radio" value="completed" name="viewMode" defaultChecked={viewMode === "completed"} ></input>DONE</label></div>
