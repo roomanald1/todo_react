@@ -185,7 +185,12 @@ export class ApplicationState {
     }
 
     private async deleteItem_internal(id: string) {
-        const r = await fetch(this.baseUrl + `/api/items/remove/${id}`, { method: "DELETE", headers: { 'Content-Type': 'application/json' } })
+        const r = await fetch(this.baseUrl + `/api/items/remove/${id}`, { 
+            method: "DELETE",
+             headers: { 
+                'Content-Type': 'application/json',
+                'user': this.getUser()?.email || ""
+             } })
         const result = await r.text();
         console.log(result);
     }
