@@ -22,14 +22,27 @@ export type DeleteDelta = {
     id: string;
 }
 
+export type User = {
+    email: string;
+    email_verified: boolean;
+    family_name: string;
+    given_name: string;
+    name: string;
+}
+
+export const isLocal = false;
+
 export class ApplicationState {
     logout() {
         removeCookie('user');
         this.setUser(undefined);
     }
-    private readonly baseUrl = "https://todo-okla.onrender.com";
+    private readonly localUrl = "http://localhost:3000";
+    private readonly remoteUrl = "https://todo-okla.onrender.com";
 
-    private userSub = new BehaviorSubject<any>(undefined);
+    private baseUrl = isLocal ? this.localUrl : this.remoteUrl;
+
+    private userSub = new BehaviorSubject<User| undefined>(undefined);
     private filterSub = new BehaviorSubject<Filter>("open");
     private itemsSub = new BehaviorSubject<any[]>([]);
     private isLoadingSub = new BehaviorSubject<boolean>(false);
@@ -127,7 +140,13 @@ export class ApplicationState {
         const filter = this.filterSub.getValue();
         const action = filter === "all" ? "/all" : filter === "completed" ? "/done" : "";
 
-        const r = await fetch(this.baseUrl + "/api/items" + action);
+        const r = await fetch(this.baseUrl + "/api/items" + action, {
+            method: "GET", 
+            headers: { 
+               'Content-Type': 'application/json',
+               'user': this.getUser()?.email || ""
+           }
+        });
         const result = await r.json();
         this.itemsSub.next(result);
         this.isLoadingSub.next(false);
@@ -150,7 +169,13 @@ export class ApplicationState {
         this.pendingActions.next({ type: "Add", description, id: Date.now().toString() });
     }
     private async addItem_internal(description: string) {
-        const r = await fetch(this.baseUrl + `/api/items/add`, { method: "PUT", headers: { 'Content-Type': 'application/json' }, body: `"${description}"` })
+        const r = await fetch(this.baseUrl + `/api/items/add`, {
+             method: "PUT", 
+             headers: { 
+                'Content-Type': 'application/json',
+                'user': this.getUser()?.email || ""
+            },
+            body: `"${description}"` })
         const result = await r.text();
         console.log(result);
     }
@@ -170,7 +195,13 @@ export class ApplicationState {
     }
 
     private async toggleStatus_internal(value: "done" | "open", id: string) {
-        const r = await fetch(this.baseUrl + `/api/items/${id}/${value}`, { method: "PUT", headers: { 'Content-Type': 'application/json' }, body: `"${id}"` });
+        const r = await fetch(this.baseUrl + `/api/items/${id}/${value}`, {
+             method: "PUT", 
+             headers: { 
+                'Content-Type': 'application/json',
+                'user': this.getUser()?.email || ""
+            }, 
+             body: `"${id}"` });
         const result = await r.text();
         console.log(result);
     }

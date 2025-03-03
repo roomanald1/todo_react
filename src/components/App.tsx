@@ -12,7 +12,7 @@ export const App = () => {
 
     const isLoading = useObservable(appContext.getIsLoading$(), false)
 
-    const user = useObservable(appContext.getUser$(), {})
+    const user = useObservable(appContext.getUser$(), undefined)
     return (
         <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
            
@@ -24,7 +24,7 @@ export const App = () => {
                 <div style={{flex: 1}}/>
                 <Filter/>
             </div>
-            <h1>{user.given_name}'s TODOs</h1>
+            <h1>{user?.given_name}'s TODOs</h1>
             <div style={{display: "flex", margin: 10}}>
                 <div style={{flex: 1}}/>
                 <button onClick={() => appContext.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
