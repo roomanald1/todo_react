@@ -36,6 +36,8 @@ export class ApplicationState {
     logout() {
         removeCookie('user');
         this.setUser(undefined);
+        this.itemsSub.next([]);
+        this.filterSub.next("open")
     }
     private readonly localUrl = "http://localhost:3000";
     private readonly remoteUrl = "https://todo-okla.onrender.com";
