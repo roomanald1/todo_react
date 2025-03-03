@@ -43,7 +43,7 @@ export const App = () => {
                         <tr className={item.completed ? "completed": "open"} key={item.id}>
                             <td style={{width: "15%", overflow: "auto"}}>
                                 <button onClick={() => appContext.toggleStatus(item.completed, item.id)}>
-                                {item.completed === true ? <FaCheck/> : <FaCircle/>}
+                                {item.completed === true ? <FaCheck style={{color: "green"}}/> : <FaCircle style={{color: "lightblue"}}/>}
                                 </button>
                             </td>
                             <td style={{width: "80%", overflow: "auto"}}>{item.description}</td>                          

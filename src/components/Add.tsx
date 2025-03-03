@@ -1,20 +1,32 @@
 import { useState, useContext } from "react";
 import { ApplicationContext } from "./ApplicationContext";
+import React from "react";
 
 
 
 
 export const Add = () => {
-    const [value, setValue] = useState<string| undefined>(undefined);
+    const [value, setValue] = useState<string>("");
     const appContext = useContext(ApplicationContext);
+
+    const add = React.useCallback(() => {
+        if (!value) return;
+        setValue("");
+        appContext.addItem(value);
+    }, [setValue, value, appContext])
+
     return (
         <div style={{display: "flex", marginBottom: 10}}>
-            <input style={{flex: 1}} type="text" placeholder="Description" onChange={(e) => setValue(e.target.value)} />
-            <button style={{width: "100px"}} onClick={() => {
-                if (!value) return;
-                appContext.addItem(value);
-                setValue(undefined);
-            }}>Add</button>
+            <input 
+                onKeyDown={(e) => e.key === "Enter" && add()} 
+                style={{flex: 1}} 
+                defaultValue={value} 
+                type="text" 
+                placeholder="Description" 
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                 />
+            <button onClick={add} type="submit" style={{width: "100px"}}>Add</button>
         </div>
     );
 };
