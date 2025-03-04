@@ -17,6 +17,7 @@ export const Add = () => {
         <div style={{display: "flex", marginBottom: 20}}>
             <input 
                 onKeyDown={(e) => e.key === "Enter" && add()} 
+                onFocus={(e) => e.currentTarget.scrollIntoView()}
                 style={{flex: 1}} 
                 defaultValue={value} 
                 type="text" 
