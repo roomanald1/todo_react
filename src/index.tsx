@@ -4,8 +4,8 @@ import './style.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Login } from './components/Login';
 import { ApplicationContext } from "./components/ApplicationContext";
-import { useObservable } from "./components/useObservable";
-import { ApplicationState } from "./components/ApplicationState";
+import { useObservable } from "./utils/useObservable";
+import { ApplicationState } from "./model/ApplicationState";
 import { useMemo } from 'react';
 import { map } from 'rxjs';
 

@@ -3,8 +3,6 @@ import { ApplicationContext } from "./ApplicationContext";
 import React from "react";
 
 
-
-
 export const Add = () => {
     const [value, setValue] = useState<string>("");
     const appContext = useContext(ApplicationContext);
@@ -16,7 +14,7 @@ export const Add = () => {
     }, [setValue, value, appContext])
 
     return (
-        <div style={{display: "flex", marginBottom: 10}}>
+        <div style={{display: "flex", marginBottom: 20}}>
             <input 
                 onKeyDown={(e) => e.key === "Enter" && add()} 
                 style={{flex: 1}} 

@@ -1,44 +1,14 @@
 import { BehaviorSubject, buffer, bufferTime, bufferWhen, filter, flatMap, interval, map, never, tap, timer } from "rxjs";
-import { Filter } from "./Filter";
+import { Filter } from "../components/Filter";
 import { getCookie, removeCookie, setCookie } from "typescript-cookie";
-
-
-export type Delta = AddDelta | MarkDelta | DeleteDelta | undefined;
-
-export type AddDelta = {
-    id: string;
-    type: "Add";
-    description: string;
-}
-
-export type MarkDelta = {
-    type: "Mark";
-    id: string;
-    completed: boolean;
-}
-
-export type DeleteDelta = {
-    type: "Delete";
-    id: string;
-}
-
-export type User = {
-    email: string;
-    email_verified: boolean;
-    family_name: string;
-    given_name: string;
-    name: string;
-}
+import { User } from "src/types/User";
+import { Delta } from "src/types/Delta";
 
 export const isLocal = false;
 
 export class ApplicationState {
-    logout() {
-        removeCookie('user');
-        this.setUser(undefined);
-        this.itemsSub.next([]);
-        this.filterSub.next("open")
-    }
+    
+
     private readonly localUrl = "http://localhost:3000";
     private readonly remoteUrl = "https://todo-okla.onrender.com";
 
@@ -216,4 +186,12 @@ export class ApplicationState {
     refresh(){
         this.fetchItems();
     }
+
+    logout() {
+        removeCookie('user');
+        this.setUser(undefined);
+        this.itemsSub.next([]);
+        this.filterSub.next("open")
+    }
+
 }
