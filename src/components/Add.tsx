@@ -12,7 +12,7 @@ export const Add = () => {
         if (!value) return;
         setValue("");
         appContext.addItem(value);
-        showNotification(`Added ${value}`)
+        setTimeout(() => showNotification(`Added ${value}`), 5000)
     }, [setValue, value, appContext])
 
     return (
