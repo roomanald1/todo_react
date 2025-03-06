@@ -4,7 +4,7 @@ import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 import { User } from "src/types/User";
 import { Delta } from "src/types/Delta";
 
-export const isLocal = false;
+export const isLocal = true;
 
 export class ApplicationState {
     
@@ -50,6 +50,10 @@ export class ApplicationState {
             for (const [id, delta] of Object.entries(compacted)) {
                 if (!delta) return;
                 switch(delta.type) {
+                    case "Amend": {
+                        await this.update_internal(delta.item);
+                        break;
+                    }
                     case "Add":{
                         await this.addItem_internal(delta.description);
                         break;
@@ -71,16 +75,18 @@ export class ApplicationState {
     private performActionLocally(delta: Delta) {
         if (!delta) return;
 
-        if (delta.type == "Add") {
+        if (delta.type === "Add") {
             this.itemsSub.next([...this.itemsSub.getValue(), { id: delta.id, description: delta.description, completed: false }]);
-        } else if (delta.type == "Mark") {
+        } else if (delta.type === "Mark") {
             if (this.filterSub.getValue() === "completed" && !delta.completed || this.filterSub.getValue() === "open" && delta.completed){
                 this.itemsSub.next(this.itemsSub.getValue().filter(item => item.id !== delta.id));
             }else {
                 this.itemsSub.next(this.itemsSub.getValue().map(item => item.id === delta.id ? { ...item, completed: delta.completed } : item));
             }
-        } else if (delta.type == "Delete") {
+        } else if (delta.type ===  "Delete") {
             this.itemsSub.next(this.itemsSub.getValue().filter(item => item.id !== delta.id));
+        } else if (delta.type === "Amend"){
+            this.itemsSub.next(this.itemsSub.getValue().map(item => item.id === delta.item.id ? { ...item, ...delta.item } : item));
         }
     }
 
@@ -185,6 +191,22 @@ export class ApplicationState {
 
     refresh(){
         this.fetchItems();
+    }
+
+    private async update_internal(item: any){
+        const r = await fetch(this.baseUrl + `/api/items/upsert`, {
+            method: "PUT", 
+            headers: { 
+               'Content-Type': 'application/json',
+               'user': this.getUser()?.email || ""
+           }, 
+            body: `"${JSON.stringify(item, null, "").replace(/\"/g, "\\\"")}"` });
+       const result = await r.text();
+       console.log(result);
+    }
+
+    updateItem(item: any){
+        this.pendingActions.next({ type: "Amend", item, id: item.id });
     }
 
     logout() {

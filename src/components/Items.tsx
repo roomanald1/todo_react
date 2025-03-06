@@ -25,7 +25,8 @@ export const Items = () => {
                     <thead>
                         <tr>
                             <th style={{ width: "15%", overflow: "auto" }}>Done</th>
-                            <th style={{ width: "80%", overflow: "auto" }}>Description</th>
+                            <th style={{ width: "65%", overflow: "auto" }}>Description</th>
+                            <th style={{ width: "15%", overflow: "auto" }}>Due</th>
                             <th style={{ width: "15%", overflow: "auto" }}></th>
                         </tr>
                     </thead>
