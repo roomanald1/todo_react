@@ -4,6 +4,7 @@ import { useObservable } from "../utils/useObservable";
 import { FaCaretDown } from "react-icons/fa";
 import { FaCaretUp } from "react-icons/fa";
 import { Popover } from "react-tiny-popover";
+import { showNotification } from "../utils/notifications";
 export type Filter = "all" | "completed" | "open";
 
 
@@ -26,7 +27,10 @@ export const Filter = () => {
                      <div> <label><input type="radio" value="open" name="viewMode" defaultChecked={viewMode === "open"}></input>OPEN</label></div>
                  </div>
             }} isOpen={open} onClickOutside={() => setOpen(false)}>
-                <button onClick={() => setOpen(prev => !prev)}>
+                <button onClick={() => {
+                    setOpen(prev => !prev);
+                    showNotification("Filter")
+                }}>
                     Filter {open ? < FaCaretUp /> : < FaCaretDown />}
                 </button>
             </Popover>

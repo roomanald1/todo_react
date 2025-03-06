@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { ApplicationContext } from "./ApplicationContext";
 import React from "react";
+import { showNotification } from "../utils/notifications";
 
 
 export const Add = () => {
@@ -11,7 +12,7 @@ export const Add = () => {
         if (!value) return;
         setValue("");
         appContext.addItem(value);
-        notify();
+        showNotification("added to TODOs");
     }, [setValue, value, appContext])
 
     return (
@@ -30,19 +31,3 @@ export const Add = () => {
         </div>
     );
 };
-
-
-export function notify() {
-    if (Notification.permission === "granted"){
-        new Notification("New Todo Added", {
-            body: "You have a new todo added",
-        });
-    }else if (Notification.permission !== "denied"){
-        Notification.requestPermission().then((permission) => {
-            // If the user accepts, let's create a notification
-            new Notification("New Todo Added", {
-                body: "You have a new todo added",
-            });
-          });
-    }
-}
