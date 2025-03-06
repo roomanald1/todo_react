@@ -12,7 +12,7 @@ export const Add = () => {
         if (!value) return;
         setValue("");
         appContext.addItem(value);
-        showNotification("added to TODOs");
+        showNotification(`Added ${value}`)
     }, [setValue, value, appContext])
 
     return (
@@ -31,3 +31,4 @@ export const Add = () => {
         </div>
     );
 };
+
