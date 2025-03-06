@@ -12,7 +12,6 @@ export const Add = () => {
         if (!value) return;
         setValue("");
         appContext.addItem(value);
-        setTimeout(() => showNotification(`Added ${value}`), 5000)
     }, [setValue, value, appContext])
 
     return (

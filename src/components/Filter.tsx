@@ -29,7 +29,6 @@ export const Filter = () => {
             }} isOpen={open} onClickOutside={() => setOpen(false)}>
                 <button onClick={() => {
                     setOpen(prev => !prev);
-                    showNotification("Filter")
                 }}>
                     Filter {open ? < FaCaretUp /> : < FaCaretDown />}
                 </button>
