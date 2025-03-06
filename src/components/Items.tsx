@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import { FaRedo } from "react-icons/fa";
+import { useContext, useMemo, useState } from "react";
+import { FaRedo, FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Item } from "./Item";
 import { ApplicationContext } from "./ApplicationContext";
 import { useObservable } from "../utils/useObservable";
-
 
 
 export const Items = () => {
@@ -13,6 +12,22 @@ export const Items = () => {
     const isLoading = useObservable(appContext.getIsLoading$(), false);
 
     const items = useObservable(appContext.getItems$(), []);
+
+    const [sortBy, setSortBy] = useState<string | null>(null);
+
+    const orderedItems = useMemo(() => {
+        if (sortBy === "due") return items?.sort((a, b) => {
+            const aDate = a.due ? Date.parse(a.due) : -1;
+            const bDate = b.due ? Date.parse(b.due) : -1;
+            return aDate - bDate;
+        });
+        if (sortBy === "due_asc") return items?.sort((b, a) => {
+            const aDate = a.due ? Date.parse(a.due) : -1;
+            const bDate = b.due ? Date.parse(b.due) : -1;
+            return aDate - bDate;
+        });
+        return items;
+    }, [items, sortBy]);
 
     return (
         <>
@@ -26,12 +41,21 @@ export const Items = () => {
                         <tr>
                             <th style={{ width: "15%", overflow: "auto" }}>Done</th>
                             <th style={{ width: "65%", overflow: "auto" }}>Description</th>
-                            <th style={{ width: "15%", overflow: "auto" }}>Due</th>
+                            <th style={{ width: "15%", overflow: "auto" }}>Due 
+                                <button onClick={() => setSortBy(current => current === "due" ? "due_asc" : "due")}>
+                                    {sortBy === "due" 
+                                        ? <FaSortUp/>
+                                        : sortBy == "due_asc" 
+                                            ? <FaSortDown/>
+                                            : <FaSort/>
+                                    }
+                                </button>
+                            </th>
                             <th style={{ width: "15%", overflow: "auto" }}></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {items?.map(item => <Item item={item} />)}
+                        {orderedItems?.map(item => <Item item={item} />)}
                     </tbody>
                 </table>
             </div>

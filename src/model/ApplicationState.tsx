@@ -4,7 +4,7 @@ import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 import { User } from "src/types/User";
 import { Delta } from "src/types/Delta";
 
-export const isLocal = false;
+export const isLocal = true;
 
 export class ApplicationState {
     

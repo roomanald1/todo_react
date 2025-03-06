@@ -16,26 +16,35 @@ export const Item = (props: { item: any; }) => {
         appContext.toggleStatus(props.item.completed, props.item.id);
     };
 
+    const onDone = () => {
+        setExpand(false);
+    }
+
     return (
-        <tr className={props.item.completed ? "completed" : "open"} key={props.item.id}>
+        <tr onDoubleClick={() => setExpand(prev => !prev)} className={props.item.completed ? "completed" : "open"} key={props.item.id}>
             <td style={{ width: "15%", overflow: "auto" }}>
                 <button onClick={onToggleStatus}>
                     {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaCircle style={{ color: "lightblue" }} />}
                 </button>
             </td>
-            <td onDoubleClick={() => setExpand(prev => !prev)} style={{ width: "65%", placeContent:"baseline", height: expand ? "200px" : "auto" , cursor: "pointer", overflow: "auto" }}>
+            <td style={{ width: "65%", placeContent:"baseline", height: expand ? "200px" : "auto" , cursor: "pointer", overflow: "auto" }}>
                 <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
                     <span>{props.item.description}</span>
-                    {expand && <ItemDetail item={props.item}/>}
+                    {expand && <ItemDetail item={props.item} onDone={onDone}/>}
                 </div>
              </td>
-            <td style={{ width: "15%", overflow: "auto" }}>{props.item.due}</td>
+            <td style={{ width: "15%", overflow: "auto" }}>
+                <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
+                    {!expand && <span>{props.item.due}</span>}
+                    {expand && <DueDetail onDone={onDone} item={props.item}/>}
+                </div>
+            </td>
             <td style={{ width: "15%", overflow: "auto" }}><button onClick={onRemove}>X</button></td>
         </tr>);
 };
 
 
-export const ItemDetail = (props: {item:any}) => {
+export const ItemDetail = (props: {item:any, onDone: () => void}) => {
     const [detail, setDetail] = useState(props.item.detail);
     const appContext = useContext(ApplicationContext);
 
@@ -43,6 +52,23 @@ export const ItemDetail = (props: {item:any}) => {
         <div style={{flex: 1}}>
             <textarea value={detail} onChange={(e) => setDetail(e.target.value)} />
         </div>
-        <button onClick={() => appContext.updateItem({...props.item, detail})}>Update</button>
+        <button onClick={() => {
+            appContext.updateItem({...props.item, detail});
+            props.onDone();
+        }}>Update</button>
+    </>);
+}
+
+export const DueDetail = (props: {item:any, onDone: () => void}) => {
+    const [due, setDue] = useState(props.item.due);
+    const appContext = useContext(ApplicationContext);
+    return (<>
+        <div style={{flex: 1}}>
+            <input type="datetime-local" value={due} onChange={(e) => setDue(e.target.value)} />
+        </div>
+        <button onClick={() => {
+            appContext.updateItem({...props.item, due});
+            props.onDone();
+        }}>Update</button>
     </>);
 }
