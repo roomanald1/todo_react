@@ -3,7 +3,7 @@ import { Filter } from "../components/Filter";
 import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 import { User } from "src/types/User";
 import { Delta } from "src/types/Delta";
-import { showNotification } from "src/utils/notifications";
+import { showNotification } from "../utils/notifications";
 
 export const isLocal = false;
 
