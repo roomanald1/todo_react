@@ -22,6 +22,8 @@ export class ApplicationState {
     private isLoadingSub = new BehaviorSubject<boolean>(false);
     private pendingActions = new BehaviorSubject<Delta>(undefined);
 
+    private errors = new BehaviorSubject<string|undefined>(undefined);
+
     constructor() {
 
         try{
@@ -110,6 +112,7 @@ export class ApplicationState {
                 try {
                     showNotification(`Item due: ${i.description} ${i.due}`);
                 }catch(e){
+                    this.errors.next(e?.toString())
                     console.log(e)
                 }
                 this.notifiedItems.next(this.notifiedItems.getValue().add(i.id));
@@ -133,6 +136,10 @@ export class ApplicationState {
 
     getNotifiedMessages$(){
         return this.notifiedItems.asObservable();
+    }
+
+    getErrors$() {
+        return this.errors.asObservable();
     }
 
     setUser(v: any) {

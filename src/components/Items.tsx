@@ -29,8 +29,11 @@ export const Items = () => {
         return items;
     }, [items, sortBy]);
 
+    const errors = useObservable(appContext?.getErrors$(), undefined);
+
     return (
         <>
+            {errors && <span>{errors}</span>}
             <div style={{ display: "flex", marginBottom: 10 }}>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => appContext?.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
