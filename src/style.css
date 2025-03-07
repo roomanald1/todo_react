@@ -95,11 +95,13 @@ input {
 th,
 td {
   padding: 5px;
+  height: 30px !important;
   background-color: rgba(255, 255, 255, 0.106);
 }
 
 th {
   text-align: left;
+  height: 30px !important;
 }
 
 thead {
@@ -109,11 +111,16 @@ thead {
 }
 
 tbody {
+
+    tr.due {
+      background-color: rgba(131, 4, 4, 0.284);
+    }
     tr.completed {
         background-color: rgba(5, 5, 5, 0.289);
         color: gray !important;
     }
   tr {
+    height: 30px !important;
     &:hover {
       background-color: rgba(255, 255, 255, 0.155);
     }

@@ -13,7 +13,7 @@ export const Items = () => {
 
     const items = useObservable(appContext?.getItems$(), []);
 
-    const [sortBy, setSortBy] = useState<string | null>(null);
+    const [sortBy, setSortBy] = useState<string | null>("due");
 
     const orderedItems = useMemo(() => {
         if (sortBy === "due") return items?.sort((a, b) => {
@@ -40,8 +40,8 @@ export const Items = () => {
                     <thead>
                         <tr>
                             <th style={{ width: "15%", overflow: "auto" }}>Done</th>
-                            <th style={{ width: "65%", overflow: "auto" }}>Description</th>
-                            <th style={{ width: "15%", overflow: "auto" }}>Due 
+                            <th style={{ width: "55%", overflow: "auto" }}>Description</th>
+                            <th style={{ width: "28%", overflow: "auto" }}>Due 
                                 <button onClick={() => setSortBy(current => current === "due" ? "due_asc" : "due")}>
                                     {sortBy === "due" 
                                         ? <FaSortDown/>
@@ -51,7 +51,7 @@ export const Items = () => {
                                     }
                                 </button>
                             </th>
-                            <th style={{ width: "15%", overflow: "auto" }}></th>
+                            <th style={{ width: "7%", overflow: "auto" }}></th>
                         </tr>
                     </thead>
                     <tbody>

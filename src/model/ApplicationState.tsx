@@ -9,7 +9,7 @@ export const isLocal = false;
 
 export class ApplicationState {
     
-    private readonly notifiedItems = new Set<string>();
+    private readonly notifiedItems = new BehaviorSubject<Set<string>>(new Set<string>());
 
     private readonly localUrl = "http://localhost:3000";
     private readonly remoteUrl = "https://todo-okla.onrender.com";
@@ -33,17 +33,14 @@ export class ApplicationState {
             console.log(e);
         }
 
+        this.fetchItems().then(_ => {
+            this.checkItemsDue();
+        })
+      
         //fetch items every 60 seconds
         interval(1000*60).subscribe(async () => {
             await this.fetchItems();
-
-            this.itemsSub
-                .getValue()
-                .filter(i => Date.parse(i.due) > Date.now() && !this.notifiedItems.has(i.id))
-                .forEach(i => {
-                    showNotification(`Item due: ${i.description} ${i.due}`);
-                    this.notifiedItems.add(i.id);
-                })
+            this.checkItemsDue();
         });
 
         this.pendingActions
@@ -105,6 +102,16 @@ export class ApplicationState {
         }
     }
 
+    checkItemsDue(){
+        this.itemsSub
+            .getValue()
+            .filter(i => Date.now() > Date.parse(i.due) && !this.notifiedItems.getValue().has(i.id))
+            .forEach(i => {
+                showNotification(`Item due: ${i.description} ${i.due}`);
+                this.notifiedItems.next(this.notifiedItems.getValue().add(i.id));
+            })
+    }
+
     getIsLoading$() {
         return this.isLoadingSub.asObservable();
     }
@@ -118,6 +125,10 @@ export class ApplicationState {
     }
     getUser$() {
         return this.userSub.asObservable();
+    }
+
+    getNotifiedMessages$(){
+        return this.notifiedItems.asObservable();
     }
 
     setUser(v: any) {

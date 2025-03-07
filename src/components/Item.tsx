@@ -2,10 +2,16 @@ import { useContext, useState } from "react";
 import { FaCheck, FaCircle } from "react-icons/fa";
 import { ApplicationContext } from "./ApplicationContext";
 import React from "react";
+import {  map } from "rxjs";
+import { useObservable } from "../utils/useObservable";
+import moment from "moment";
 
 export const Item = (props: { item: any; }) => {
     const [expand, setExpand] = React.useState<boolean>();
     const appContext = useContext(ApplicationContext);
+
+    const isDue = useObservable(appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))), false);
+
     const onRemove = () => {
         if (window.confirm("Are you sure you want to remove this item?")) {
             appContext?.deleteItem(props.item.id);
@@ -20,8 +26,14 @@ export const Item = (props: { item: any; }) => {
         setExpand(false);
     }
 
+    const className = isDue 
+        ? "due" 
+        : props.item.completed 
+            ? "completed" 
+            : "open";
+
     return (
-        <tr onDoubleClick={() => setExpand(prev => !prev)} className={props.item.completed ? "completed" : "open"} key={props.item.id}>
+        <tr onDoubleClick={() => setExpand(prev => !prev)} className={className} key={props.item.id}>
             <td style={{ width: "15%", overflow: "auto" }}>
                 <button onClick={onToggleStatus}>
                     {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaCircle style={{ color: "lightblue" }} />}
@@ -33,13 +45,13 @@ export const Item = (props: { item: any; }) => {
                     {expand && <ItemDetail item={props.item} onDone={onDone}/>}
                 </div>
              </td>
-            <td style={{ width: "15%", overflow: "auto" }}>
+            <td style={{ width: "25%", overflow: "auto" }}>
                 <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
-                    {!expand && <span>{props.item.due}</span>}
+                    {!expand && <span>{moment(props.item.due).fromNow()}</span>}
                     {expand && <DueDetail onDone={onDone} item={props.item}/>}
                 </div>
             </td>
-            <td style={{ width: "15%", overflow: "auto" }}><button onClick={onRemove}>X</button></td>
+            <td style={{ width: "5%", overflow: "auto" }}><button onClick={onRemove}>X</button></td>
         </tr>);
 };
 
