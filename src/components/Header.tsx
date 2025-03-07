@@ -8,13 +8,13 @@ export const Header = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const user = useObservable(appContext.getUser$(), undefined);
+    const user = useObservable(appContext?.getUser$(), undefined);
 
     return ( <>
         <div style={{display: "flex"}}>
             <button onClick={() => {
                 googleLogout();
-                appContext.logout();
+                appContext?.logout();
             }}>Log Out</button>
             <div style={{flex: 1}}/>
             <Filter/>

@@ -16,7 +16,7 @@ export const Login = () => {
             );
 
             console.log(userInfo);
-            appContext.setUser(userInfo.data)
+            appContext?.setUser(userInfo.data)
         },
         onError: errorResponse => console.log(errorResponse),
     });

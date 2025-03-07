@@ -11,7 +11,7 @@ export const Add = () => {
     const add = React.useCallback(() => {
         if (!value) return;
         setValue("");
-        appContext.addItem(value);
+        appContext?.addItem(value);
     }, [setValue, value, appContext])
 
     return (

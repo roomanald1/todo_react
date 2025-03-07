@@ -8,12 +8,12 @@ export const Item = (props: { item: any; }) => {
     const appContext = useContext(ApplicationContext);
     const onRemove = () => {
         if (window.confirm("Are you sure you want to remove this item?")) {
-            appContext.deleteItem(props.item.id);
+            appContext?.deleteItem(props.item.id);
         }
     };
 
     const onToggleStatus = () => {
-        appContext.toggleStatus(props.item.completed, props.item.id);
+        appContext?.toggleStatus(props.item.completed, props.item.id);
     };
 
     const onDone = () => {
@@ -53,7 +53,7 @@ export const ItemDetail = (props: {item:any, onDone: () => void}) => {
             <textarea value={detail} onChange={(e) => setDetail(e.target.value)} />
         </div>
         <button onClick={() => {
-            appContext.updateItem({...props.item, detail});
+            appContext?.updateItem({...props.item, detail});
             props.onDone();
         }}>Update</button>
     </>);
@@ -67,7 +67,7 @@ export const DueDetail = (props: {item:any, onDone: () => void}) => {
             <input type="datetime-local" value={due} onChange={(e) => setDue(e.target.value)} />
         </div>
         <button onClick={() => {
-            appContext.updateItem({...props.item, due});
+            appContext?.updateItem({...props.item, due});
             props.onDone();
         }}>Update</button>
     </>);

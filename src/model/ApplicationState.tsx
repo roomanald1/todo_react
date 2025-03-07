@@ -37,7 +37,7 @@ export class ApplicationState {
             await this.fetchItems();
 
             this.itemsSub.getValue().filter(i => Date.parse(i.due) > Date.now()).forEach(i => {
-                showNotification(`Item due: ${i.description}`);
+                showNotification(`Item due: ${i.description} ${i.due}`);
             })
         });
 

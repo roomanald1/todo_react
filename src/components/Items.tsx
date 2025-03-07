@@ -9,9 +9,9 @@ export const Items = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const isLoading = useObservable(appContext.getIsLoading$(), false);
+    const isLoading = useObservable(appContext?.getIsLoading$(), false);
 
-    const items = useObservable(appContext.getItems$(), []);
+    const items = useObservable(appContext?.getItems$(), []);
 
     const [sortBy, setSortBy] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export const Items = () => {
         <>
             <div style={{ display: "flex", marginBottom: 10 }}>
                 <div style={{ flex: 1 }} />
-                <button onClick={() => appContext.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
+                <button onClick={() => appContext?.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
             </div>
             <div style={{ flex: 1, overflow: "auto" }}>
                 <table>

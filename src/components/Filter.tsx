@@ -12,7 +12,7 @@ export type Filter = "all" | "completed" | "open";
 export const Filter = () => {
     const [open, setOpen] = useState<boolean>(false);
     const appContext = useContext(ApplicationContext);
-    const viewMode = useObservable(appContext.getFilter$(), "open");
+    const viewMode = useObservable(appContext?.getFilter$(), "open");
     
     return (
             <Popover containerClassName="popover-root" reposition={false} positions={['bottom', 'left']} content={() => {
@@ -21,7 +21,7 @@ export const Filter = () => {
                          background:"linear-gradient(45deg, black, #461a63)",
                          borderRadius: 3, 
                          border:"1px solid #602c82c8"
-                     }} onChange={(e: any) => appContext.setFilter(e.target.value)}>
+                     }} onChange={(e: any) => appContext?.setFilter(e.target.value)}>
                      <div><label><input type="radio" value="all" name="viewMode" defaultChecked={viewMode === "all"}></input>ALL</label></div>
                      <div><label><input type="radio" value="completed" name="viewMode" defaultChecked={viewMode === "completed"} ></input>DONE</label></div>
                      <div> <label><input type="radio" value="open" name="viewMode" defaultChecked={viewMode === "open"}></input>OPEN</label></div>
