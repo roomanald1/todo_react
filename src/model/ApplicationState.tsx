@@ -9,6 +9,7 @@ export const isLocal = false;
 
 export class ApplicationState {
     
+    private readonly notifiedItems = new Set<string>();
 
     private readonly localUrl = "http://localhost:3000";
     private readonly remoteUrl = "https://todo-okla.onrender.com";
@@ -36,9 +37,13 @@ export class ApplicationState {
         interval(1000*60).subscribe(async () => {
             await this.fetchItems();
 
-            this.itemsSub.getValue().filter(i => Date.parse(i.due) > Date.now()).forEach(i => {
-                showNotification(`Item due: ${i.description} ${i.due}`);
-            })
+            this.itemsSub
+                .getValue()
+                .filter(i => Date.parse(i.due) > Date.now() && !this.notifiedItems.has(i.id))
+                .forEach(i => {
+                    showNotification(`Item due: ${i.description} ${i.due}`);
+                    this.notifiedItems.add(i.id);
+                })
         });
 
         this.pendingActions
