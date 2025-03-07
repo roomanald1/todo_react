@@ -113,7 +113,7 @@ thead {
 tbody {
 
     tr.due {
-      background-color: rgba(131, 4, 4, 0.284);
+      background-color: rgba(131, 4, 4, 0.284) !important;
     }
     tr.completed {
         background-color: rgba(5, 5, 5, 0.289);
