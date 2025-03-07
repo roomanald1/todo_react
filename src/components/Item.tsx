@@ -47,7 +47,7 @@ export const Item = (props: { item: any; }) => {
              </td>
             <td style={{ width: "25%", overflow: "auto" }}>
                 <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
-                    {!expand && <span>{moment(props.item.due).fromNow()}</span>}
+                    <span>{moment(props.item.due).fromNow()}</span>
                     {expand && <DueDetail onDone={onDone} item={props.item}/>}
                 </div>
             </td>

@@ -1,15 +1,21 @@
 
 export function showNotification(msg: string) {
-    if (!Notification){
-        console.log("Notifications not available");
-        return;
-    }
-    if (Notification.permission === "granted"){
-        new Notification(msg);
-    }else if (Notification.permission !== "denied"){
-        Notification.requestPermission().then((permission) => {
-            // If the user accepts, let's create a notification
-            new Notification(msg);
-          });
-    }
+
+
+    Notification.requestPermission().then((permission) => {
+        if (permission == "granted")
+            try{
+                new Notification(msg);
+            }catch(e){
+                navigator.serviceWorker.ready.then((registration) => {
+                    registration.showNotification(msg);
+                  });
+            }
+        });
+}
+
+try{
+    navigator.serviceWorker.register("sw.js");
+}catch(e){
+    console.log(e);
 }

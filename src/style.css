@@ -85,6 +85,11 @@ input[type="radio"] {
     accent-color: #602c8257;
    
 }
+input[type="datetime-local"] {
+  width:20px;
+  color: white;
+  color-scheme: dark;
+}
 
 input {
   background: rgba(0, 0, 0, 0.204);
