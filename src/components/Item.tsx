@@ -51,7 +51,7 @@ export const Item = (props: { item: any; }) => {
                     {expand && <DueDetail onDone={onDone} item={props.item}/>}
                 </div>
             </td>
-            <td style={{ width: "5%", overflow: "auto" }}><button onClick={onRemove}>X</button></td>
+            <td style={{ width: "23px", overflow: "auto" }}><button onClick={onRemove}>X</button></td>
         </tr>);
 };
 

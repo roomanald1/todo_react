@@ -51,7 +51,7 @@ export const Items = () => {
                                     }
                                 </button>
                             </th>
-                            <th style={{ width: "7%", overflow: "auto" }}></th>
+                            <th style={{ width: "23px", overflow: "auto" }}></th>
                         </tr>
                     </thead>
                     <tbody>
