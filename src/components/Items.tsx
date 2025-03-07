@@ -44,9 +44,9 @@ export const Items = () => {
                             <th style={{ width: "15%", overflow: "auto" }}>Due 
                                 <button onClick={() => setSortBy(current => current === "due" ? "due_asc" : "due")}>
                                     {sortBy === "due" 
-                                        ? <FaSortUp/>
+                                        ? <FaSortDown/>
                                         : sortBy == "due_asc" 
-                                            ? <FaSortDown/>
+                                            ? <FaSortUp/>
                                             : <FaSort/>
                                     }
                                 </button>
