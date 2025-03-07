@@ -3,6 +3,7 @@ import { Filter } from "../components/Filter";
 import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 import { User } from "src/types/User";
 import { Delta } from "src/types/Delta";
+import { showNotification } from "src/utils/notifications";
 
 export const isLocal = false;
 
@@ -34,8 +35,12 @@ export class ApplicationState {
         //fetch items every 60 seconds
         timer(1000*60).subscribe(async () => {
             await this.fetchItems();
+
+            this.itemsSub.getValue().filter(i => Date.parse(i.due) > Date.now()).forEach(i => {
+                showNotification(`Item due: ${i.description}`);
+            })
         });
-        
+
         this.pendingActions
             .pipe(
                 tap((x) => this.performActionLocally(x)),
