@@ -31,43 +31,48 @@ export class ApplicationState {
             console.log(e);
         }
 
+        //fetch items every 60 seconds
+        timer(1000*60).subscribe(async () => {
+            await this.fetchItems();
+        });
+        
         this.pendingActions
-        .pipe(
-            tap((x) => this.performActionLocally(x)),
-            buffer(this.isLoadingSub.pipe(flatMap(isLoading => {
-                return isLoading ? never(): interval(200)
-            })))
-        )
-        .subscribe(async deltas => {
-            if (deltas?.length === 0) return;
-            //Sync up with service
-            const compacted = deltas.reduce((prev, curr) => {
-                if (!curr) return prev;
-                prev[curr.id] = curr;
-                return prev;
-            }, {} as {[index:string]: Delta});
+            .pipe(
+                tap((x) => this.performActionLocally(x)),
+                buffer(this.isLoadingSub.pipe(flatMap(isLoading => {
+                    return isLoading ? never(): interval(200)
+                })))
+            )
+            .subscribe(async deltas => {
+                if (deltas?.length === 0) return;
+                //Sync up with service
+                const compacted = deltas.reduce((prev, curr) => {
+                    if (!curr) return prev;
+                    prev[curr.id] = curr;
+                    return prev;
+                }, {} as {[index:string]: Delta});
 
-            for (const [id, delta] of Object.entries(compacted)) {
-                if (!delta) return;
-                switch(delta.type) {
-                    case "Amend": {
-                        await this.update_internal(delta.item);
-                        break;
-                    }
-                    case "Add":{
-                        await this.addItem_internal(delta.description);
-                        break;
-                    }
-                    case "Mark":{
-                        await this.toggleStatus_internal(!delta.completed ? "open" : "done", id);
-                        break;
-                    }
-                    case "Delete":{
-                        await this.deleteItem_internal(delta.id);
-                        break;
+                for (const [id, delta] of Object.entries(compacted)) {
+                    if (!delta) return;
+                    switch(delta.type) {
+                        case "Amend": {
+                            await this.update_internal(delta.item);
+                            break;
+                        }
+                        case "Add":{
+                            await this.addItem_internal(delta.description);
+                            break;
+                        }
+                        case "Mark":{
+                            await this.toggleStatus_internal(!delta.completed ? "open" : "done", id);
+                            break;
+                        }
+                        case "Delete":{
+                            await this.deleteItem_internal(delta.id);
+                            break;
+                        }
                     }
                 }
-            }
             await this.fetchItems();
         })
     }
