@@ -107,7 +107,11 @@ export class ApplicationState {
             .getValue()
             .filter(i => Date.now() > Date.parse(i.due) && !this.notifiedItems.getValue().has(i.id))
             .forEach(i => {
-                showNotification(`Item due: ${i.description} ${i.due}`);
+                try {
+                    showNotification(`Item due: ${i.description} ${i.due}`);
+                }catch(e){
+                    console.log(e)
+                }
                 this.notifiedItems.next(this.notifiedItems.getValue().add(i.id));
             })
     }
