@@ -1,4 +1,4 @@
-import { BehaviorSubject, buffer, bufferTime, bufferWhen, filter, flatMap, interval, map, never, tap, timer } from "rxjs";
+import { BehaviorSubject, buffer, flatMap, interval,  never, tap } from "rxjs";
 import { Filter } from "../components/Filter";
 import { getCookie, removeCookie, setCookie } from "typescript-cookie";
 import { User } from "src/types/User";
@@ -33,7 +33,7 @@ export class ApplicationState {
         }
 
         //fetch items every 60 seconds
-        timer(1000*60).subscribe(async () => {
+        interval(1000*60).subscribe(async () => {
             await this.fetchItems();
 
             this.itemsSub.getValue().filter(i => Date.parse(i.due) > Date.now()).forEach(i => {
