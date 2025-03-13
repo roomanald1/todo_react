@@ -5,12 +5,13 @@ import React from "react";
 import {  map } from "rxjs";
 import { useObservable } from "../utils/useObservable";
 import moment from "moment";
+import { Todo } from "src/model/ApplicationState";
 
 export const Item = (props: { item: any; }) => {
     const [expand, setExpand] = React.useState<boolean>();
     const appContext = useContext(ApplicationContext);
 
-    const isDue = useObservable(appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))), false);
+    const isDue = useObservable(() => appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))), false, [appContext]);
 
     const onRemove = () => {
         if (window.confirm("Are you sure you want to remove this item?")) {
@@ -56,13 +57,17 @@ export const Item = (props: { item: any; }) => {
 };
 
 
-export const ItemDetail = (props: {item:any, onDone: () => void}) => {
+export const ItemDetail = (props: {item:Todo, onDone: () => void}) => {
     const [detail, setDetail] = useState(props.item.detail);
     const appContext = useContext(ApplicationContext);
 
+    React.useEffect(() => {
+        setDetail(prev => props.item.detail ?? prev);
+    }, [props.item.detail]);
+    
     return (<>
         <div style={{flex: 1}}>
-            <textarea value={detail} onChange={(e) => setDetail(e.target.value)} />
+            <textarea value={detail ?? undefined} onChange={(e) => setDetail(e.target.value)} />
         </div>
         <button onClick={() => {
             appContext?.updateItem({...props.item, detail});

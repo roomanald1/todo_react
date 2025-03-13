@@ -15,7 +15,7 @@ export const Bootstrap = () => {
 
   const state = useMemo(() => new ApplicationState(), []);
 
-  const isLoggedIn = useObservable(state.getUser$().pipe(map(user => user !== undefined)), false);
+  const isLoggedIn = useObservable(() => state.getUser$().pipe(map(user => user !== undefined)), false, [state]);
 
   return <GoogleOAuthProvider clientId={clientId}>
     <ApplicationContext.Provider value={state}>

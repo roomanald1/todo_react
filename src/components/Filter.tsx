@@ -12,7 +12,7 @@ export type Filter = "all" | "completed" | "open";
 export const Filter = () => {
     const [open, setOpen] = useState<boolean>(false);
     const appContext = useContext(ApplicationContext);
-    const viewMode = useObservable(appContext?.getFilter$(), "open");
+    const viewMode: Filter | undefined = useObservable(() => appContext?.getFilter$(), "open", [appContext]);
     
     return (
             <Popover containerClassName="popover-root" reposition={false} positions={['bottom', 'left']} content={() => {

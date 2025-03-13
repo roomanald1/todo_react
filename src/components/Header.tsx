@@ -8,7 +8,7 @@ export const Header = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const user = useObservable(appContext?.getUser$(), undefined);
+    const user = useObservable(() => appContext?.getUser$(), undefined, [appContext]);
 
     return ( <>
         <div style={{display: "flex"}}>
