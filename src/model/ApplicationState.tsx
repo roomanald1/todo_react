@@ -18,9 +18,11 @@ export class ApplicationState {
 
     private userSub = new BehaviorSubject<User| undefined>(undefined);
     private filterSub = new BehaviorSubject<Filter>("open");
-    private itemsSub = new BehaviorSubject<any[]>([]);
+    private itemsSub = new BehaviorSubject<Partial<Todo>[]>([]);
     private isLoadingSub = new BehaviorSubject<boolean>(false);
     private pendingActions = new BehaviorSubject<Partial<Todo> | undefined>(undefined);
+
+    private todaySub = new BehaviorSubject<boolean>(true);
 
     private errors = new BehaviorSubject<string|undefined>(undefined);
 
@@ -92,7 +94,7 @@ export class ApplicationState {
         }
     }
 
-    private reconcile(oldItems: Todo[], newItems: Todo[]): Todo[] {
+    private reconcile(oldItems: Todo[], newItems: Partial<Todo>[]) {
         //console.log("recon start", oldItems, newItems);
         const allItems = [...newItems, ...oldItems]
             .sort((a,b) => Number(a.last_updated ?? a.added_on ?? "") < Number(b.last_updated ?? b.added_on ?? "") ? 1 : -1);
@@ -107,7 +109,7 @@ export class ApplicationState {
     checkItemsDue(){
         this.itemsSub
             .getValue()
-            .filter(i => !i.completed && Date.now() > Date.parse(i.due) && !this.notifiedItems.getValue().has(i.id))
+            .filter(i => !i.completed && Date.now() > Date.parse(i.due ?? "") && !this.notifiedItems.getValue().has(i.id?.toString() ?? ""))
             .forEach(i => {
                 try {
                     showNotification(`Item due: ${i.description} ${i.due}`);
@@ -115,7 +117,7 @@ export class ApplicationState {
                     this.errors.next(e?.toString())
                     console.log(e)
                 }
-                this.notifiedItems.next(this.notifiedItems.getValue().add(i.id));
+                this.notifiedItems.next(this.notifiedItems.getValue().add(i.id?.toString() ?? ""));
             })
     }
 
@@ -124,16 +126,26 @@ export class ApplicationState {
     }
 
     getItems$() {
-         return combineLatest([this.itemsSub, this.filterSub])
+         return combineLatest([this.itemsSub, this.filterSub, this.todaySub])
              .pipe(
-                 map(([items, filterOp]) => {
+                 map(([items, filterOp, today]) => {
+                    const filterByToday = (item: Partial<Todo>) => {
+                        if (today){
+                            const today_1 = new Date();
+                            today_1.setDate(new Date().getDate() + 1)
+                            return Date.parse(item.due ?? "") < today_1.getTime()
+                        }else {
+                            return true;
+                        }
+                    }
+
                      switch(filterOp){
                          case "all":
-                             return items;
+                             return items.filter(i => filterByToday(i));
                          case "completed":
-                             return items.filter(i => i.completed === true);
+                             return items.filter(i => i.completed === true && filterByToday(i));
                          case "open":
-                             return items.filter(i => !i.completed);
+                             return items.filter(i => !i.completed && filterByToday(i));
                      }
                  }),
                  map(_ => _.filter(i => !i.is_deleted))
@@ -161,6 +173,14 @@ export class ApplicationState {
         if (v) {
             this.fetchItems();
         }
+    }
+
+    getToday$(){
+        return this.todaySub.asObservable();
+    }
+
+    toggleToday(){
+        this.todaySub.next(!this.todaySub.getValue());
     }
 
     async fetchItems() {
@@ -211,7 +231,7 @@ export class ApplicationState {
         this.pendingActions.next({...item});
     }
 
-    private async set(items: Todo[]){
+    private async set(items: Partial<Todo>[]){
         const r = await fetch(this.baseUrl + `/api/set`, {
             method: "PUT", 
             headers: { 

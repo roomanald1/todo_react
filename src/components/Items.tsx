@@ -11,7 +11,7 @@ export const Items = () => {
 
     const isLoading = useObservable(() => appContext?.getIsLoading$(), false, [appContext]);
 
-    const items = useObservable(() => appContext?.getItems$(), [appContext]);
+    const items = useObservable(() => appContext?.getItems$(), [], [appContext]);
 
     const [sortBy, setSortBy] = useState<string | null>("due");
 
