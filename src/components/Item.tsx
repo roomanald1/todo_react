@@ -64,9 +64,9 @@ export const ItemDetail = (props: {item:Todo, onDone: () => void}) => {
     React.useEffect(() => {
         setDetail(prev => props.item.detail ?? prev);
     }, [props.item.detail]);
-    
+
     return (<>
-        <div style={{flex: 1}}>
+        <div style={{flex: 1, minHeight: 300}}>
             <textarea value={detail ?? undefined} onChange={(e) => setDetail(e.target.value)} />
         </div>
         <button onClick={() => {
