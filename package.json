@@ -4,7 +4,9 @@
     "main": "index.ts",
     "scripts": {
         "start": "webpack serve --mode development",
-        "build": "yarn install && webpack build --mode production"
+        "build": "yarn install && webpack build --mode production",
+        "test": "jest"
+
     },
     "dependencies": {
         "@react-oauth/google": "^0.12.1",
