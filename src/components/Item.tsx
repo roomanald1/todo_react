@@ -5,7 +5,7 @@ import React from "react";
 import {  map } from "rxjs";
 import { useObservable } from "../utils/useObservable";
 import moment from "moment";
-import { Todo } from "src/model/ApplicationState";
+import { Todo } from "src/model/applicationState";
 
 export const Item = (props: { item: any; }) => {
     const [expand, setExpand] = React.useState<boolean>();
@@ -33,8 +33,14 @@ export const Item = (props: { item: any; }) => {
             ? "completed" 
             : "open";
 
+    const onExpand = (e: React.MouseEvent<HTMLTableRowElement>) => {
+        setExpand(prev => !prev)
+
+        e.currentTarget.scrollIntoView()
+    }
+
     return (
-        <tr onDoubleClick={() => setExpand(prev => !prev)} className={className} key={props.item.id}>
+        <tr onDoubleClick={onExpand} className={className} key={props.item.id}>
             <td style={{ width: "15%", overflow: "auto" }}>
                 <button onClick={onToggleStatus}>
                     {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaCircle style={{ color: "lightblue" }} />}

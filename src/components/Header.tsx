@@ -8,8 +8,8 @@ export const Header = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const user = useObservable(() => appContext?.getUser$(), undefined, [appContext]);
-    const today = useObservable(() => appContext?.getToday$(), undefined, [appContext]);
+    const user = useObservable(() => appContext?.user().getUser$(), undefined, [appContext]);
+    const today = useObservable(() => appContext?.filter().getToday$(), undefined, [appContext]);
     return ( <>
         <div style={{display: "flex"}}>
             <button onClick={() => {
@@ -17,9 +17,10 @@ export const Header = () => {
                 appContext?.logout();
             }}>Log Out</button>
             <div style={{flex: 1}}/>
-            <button style={{marginRight: 20}} onClick={() => appContext?.toggleToday()}>{today ? "Today" : "All"}</button>
+            <span style={{placeContent: "center", marginRight: 20}}>{user?.given_name}</span>
+            <button style={{marginRight: 20}} onClick={() => appContext?.filter().toggleToday()}>{today ? "Today" : "All"}</button>
             <Filter/>
         </div>
-        <h1 style={{textAlign: "center"}}>{user?.given_name}'s TODOs</h1>
+
     </>)
 }

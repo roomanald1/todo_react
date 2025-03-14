@@ -5,7 +5,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Login } from './components/Login';
 import { ApplicationContext } from "./components/ApplicationContext";
 import { useObservable } from "./utils/useObservable";
-import { ApplicationState } from "./model/ApplicationState";
+import { ApplicationState } from "./model/applicationState";
 import { useMemo } from 'react';
 import { map } from 'rxjs';
 
@@ -15,7 +15,7 @@ export const Bootstrap = () => {
 
   const state = useMemo(() => new ApplicationState(), []);
 
-  const isLoggedIn = useObservable(() => state.getUser$().pipe(map(user => user !== undefined)), false, [state]);
+  const isLoggedIn = useObservable(() => state.user().getUser$().pipe(map(user => user !== undefined)), false, [state]);
 
   return <GoogleOAuthProvider clientId={clientId}>
     <ApplicationContext.Provider value={state}>
