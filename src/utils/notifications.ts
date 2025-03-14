@@ -14,8 +14,10 @@ export function showNotification(msg: string) {
         });
 }
 
-try{
-    navigator.serviceWorker.register("sw.js");
-}catch(e){
-    console.log(e);
+export function initialiseNotifications(){
+    try{
+        navigator.serviceWorker.register("sw.js");
+    }catch(e){
+        console.log(e);
+    }
 }

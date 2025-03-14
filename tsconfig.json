@@ -8,6 +8,7 @@
         "rootDir": ".",
         "baseUrl": ".",
         "strict": true,
+        "types": ["jest"],
         "allowSyntheticDefaultImports": true,
         "isolatedModules": true,
         "esModuleInterop": true

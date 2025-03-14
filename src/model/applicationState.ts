@@ -228,9 +228,13 @@ export class ApplicationState {
 
 }
 
-export function reconcile(oldItems: Todo[], newItems: Partial<Todo>[]) {
+export function reconcile(oldItems: Todo[], newItems: Partial<Todo>[]): Partial<Todo>[] {
     const allItems = [...newItems, ...oldItems]
-        .sort((a, b) => Number(a.last_updated ?? a.added_on ?? "") < Number(b.last_updated ?? b.added_on ?? "") ? 1 : -1);
+        .sort((a, b) => {
+            const dateA = a.last_updated ?? a.added_on ?? "";
+            const dateB = b.last_updated ?? b.added_on ?? "";
+            return dateB.localeCompare(dateA);
+        });
     const uniqueItems = _uniqWith(allItems, (a, b) => a.id === b.id);
     return uniqueItems;
 }

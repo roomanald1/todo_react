@@ -8,6 +8,7 @@ import { useObservable } from "./utils/useObservable";
 import { ApplicationState } from "./model/applicationState";
 import { useMemo } from 'react';
 import { map } from 'rxjs';
+import { initialiseNotifications } from './utils/notifications';
 
 const clientId = "679057157657-p3do263k151dc2e813mjeloejetgjshv.apps.googleusercontent.com"
 
@@ -24,6 +25,8 @@ export const Bootstrap = () => {
     </ApplicationContext.Provider>
   </GoogleOAuthProvider>
 }
+
+initialiseNotifications();
 
 ReactDOM
   .createRoot(document.getElementById('app') as HTMLElement)
