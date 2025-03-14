@@ -101,6 +101,11 @@ export class ApplicationState {
         }
     }
 
+    clearLocal(){
+        localStorage.removeItem('items');
+        this.fetchItems();
+    }
+
     checkItemsDue() {
         this.itemsSub
             .getValue()
@@ -196,7 +201,7 @@ export class ApplicationState {
     }
 
     refresh() {
-        this.fetchItems();
+        this.clearLocal();
     }
 
     updateItem(item: Todo) {

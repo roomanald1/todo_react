@@ -11,7 +11,7 @@ export const Header = () => {
     const user = useObservable(() => appContext?.user().getUser$(), undefined, [appContext]);
     const today = useObservable(() => appContext?.filter().getToday$(), undefined, [appContext]);
     return ( <>
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex", marginBottom: 5}}>
             <button onClick={() => {
                 googleLogout();
                 appContext?.logout();
