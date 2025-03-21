@@ -8,8 +8,8 @@ export const Header = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const user = useObservable(() => appContext?.user().getUser$(), undefined, [appContext]);
-    const today = useObservable(() => appContext?.filter().getToday$(), undefined, [appContext]);
+    const user = useObservable(() => appContext?.user().getUser$());
+    const today = useObservable(() => appContext?.filter().getToday$());
     return ( <>
         <div style={{display: "flex", marginBottom: 5}}>
             <button onClick={() => {

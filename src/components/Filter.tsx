@@ -5,11 +5,12 @@ import { FaCaretDown } from "react-icons/fa";
 import { FaCaretUp } from "react-icons/fa";
 import { Popover } from "react-tiny-popover";
 import { FilterOp } from "../model/filterModel";
+import { startWith } from "rxjs";
 
 export const Filter = () => {
     const [open, setOpen] = useState<boolean>(false);
     const appContext = useContext(ApplicationContext);
-    const viewMode: FilterOp | undefined = useObservable(() => appContext?.filter().getFilter$(), "open", [appContext]);
+    const viewMode: FilterOp | undefined = useObservable(() => appContext?.filter().getFilter$().pipe(startWith("open" as FilterOp)));
     
     return (
             <Popover containerClassName="popover-root" reposition={false} positions={['bottom', 'left']} content={() => {

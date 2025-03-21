@@ -11,7 +11,7 @@ export const Item = (props: { item: any; }) => {
     const [expand, setExpand] = React.useState<boolean>();
     const appContext = useContext(ApplicationContext);
 
-    const isDue = useObservable(() => appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))), false, [appContext]);
+    const isDue = useObservable(() => appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))));
 
     const onRemove = () => {
         if (window.confirm("Are you sure you want to remove this item?")) {

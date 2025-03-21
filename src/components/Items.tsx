@@ -9,9 +9,9 @@ export const Items = () => {
 
     const appContext = useContext(ApplicationContext);
 
-    const isLoading = useObservable(() => appContext?.getIsLoading$(), false, [appContext]);
+    const isLoading = useObservable(() => appContext?.getIsLoading$());
 
-    const items = useObservable(() => appContext?.getItems$(), [], [appContext]);
+    const items = useObservable(() => appContext?.getItems$());
 
     const [sortBy, setSortBy] = useState<string | null>("due");
 
@@ -29,7 +29,7 @@ export const Items = () => {
         return items;
     }, [items, sortBy]);
 
-    const errors = useObservable(() => appContext?.getErrors$(), undefined, [appContext]);
+    const errors = useObservable(() => appContext?.getErrors$());
 
     return (
         <>
