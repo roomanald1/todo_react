@@ -54,7 +54,7 @@ export class ApplicationState {
 
         this.userModsSub
             .pipe(
-                throttleTime(2000),
+                throttleTime(2000, undefined, {trailing: true, leading: false}),
                 filter(i => i !== undefined && i.length > 0),
                 distinctUntilChanged()
             )
@@ -157,14 +157,14 @@ export class ApplicationState {
 
 
     deleteItem(id: number) {
-        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === id), {id: id, action: "Remove"}]);
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id !== id), {id: id, action: "Remove"}]);
     }
 
 
     toggleStatus(value: boolean, id: number) {
         const existingItem = this.serverItemsSub.getValue().find(i => i.id === id);
         if (existingItem === undefined) return;
-        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === id), {id: id, action: "Update", data : {...existingItem, completed: !value}}]);
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id !== id), {id: id, action: "Update", data : {...existingItem, completed: !value}}]);
     }
 
     refresh() {
@@ -173,11 +173,12 @@ export class ApplicationState {
 
     updateItem(item: Todo) {
 
-        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === item.id), {id: item.id, action: "Update", data : item}]);
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id !== item.id), {id: item.id, action: "Update", data : item}]);
     }
 
     private async update(items: TodoUpdate[]) {
         this.isLoadingSub.next(true);
+        const modsBefore= this.userModsSub.getValue();
         const r = await fetch(this.baseUrl + `/api/update`, {
             method: "PUT",
             headers: {
@@ -188,7 +189,7 @@ export class ApplicationState {
         });
         const result = await r.json();
         //remove ONLY processed items. since new items may have been added whilst syncing
-        this.userModsSub.next(this.userModsSub.getValue().filter(i => items.find(l => JSON.stringify(l) === JSON.stringify(i)) === undefined));
+        this.userModsSub.next(this.userModsSub.getValue().filter(i => !items.some(l => JSON.stringify(l) === JSON.stringify(i))));
         this.serverItemsSub.next(result);
         this.isLoadingSub.next(false);
     }
@@ -198,7 +199,7 @@ export class ApplicationState {
         this.serverItemsSub.next([]);
         this.userModsSub.next([]);
         this._filter.setFilter("open")
-    }
+    } 
 
 }
 
