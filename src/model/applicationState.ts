@@ -1,25 +1,24 @@
-import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, interval, map, throttleTime } from "rxjs";
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, interval, map, startWith, throttleTime } from "rxjs";
 import { showNotification } from "../utils/notifications";
 import _uniqWith from "lodash/uniqWith";
 import { FilterModel } from "./filterModel";
 import { UserModel } from "./userModel";
 
-export const isLocal = false;
+export const isLocal = true;
 
 export class ApplicationState {
 
     private readonly notifiedItems = new BehaviorSubject<Set<string>>(new Set<string>());
 
-    private readonly localUrl = "http://localhost:3000";
+    private readonly localUrl = "http://localhost:8000";
     private readonly remoteUrl = "https://todo-okla.onrender.com";
 
     private baseUrl = isLocal ? this.localUrl : this.remoteUrl;
 
+    private serverItemsSub = new BehaviorSubject<Todo[]>([]);
+    private userModsSub = new BehaviorSubject<TodoUpdate[]>([]);
 
-    private itemsSub = new BehaviorSubject<Partial<Todo>[]>([]);
     private isLoadingSub = new BehaviorSubject<boolean>(false);
-    private pendingActions = new BehaviorSubject<Partial<Todo> | undefined>(undefined);
-
 
     private _filter = new FilterModel();
     private _user = new UserModel();
@@ -28,50 +27,39 @@ export class ApplicationState {
     constructor() {
 
         try {
-            this.itemsSub.next(JSON.parse(localStorage.getItem('items') ?? ""));
+            this.serverItemsSub.next(JSON.parse(localStorage.getItem('items') ?? ""));
+            this.userModsSub.next(JSON.parse(localStorage.getItem('user_mods') ?? ""));
         } catch (e) {
             console.log(e);
         }
 
-        this.fetchItems().then(_ => {
-            this.checkItemsDue();
-        })
+        //fetch items every 20 seconds
+        interval(1000 * 20)
+            .pipe(startWith(0))
+            .subscribe(async () => {
+                await this.fetchItems();
+                this.checkItemsDue();
+            });
 
-        //fetch items every 60 seconds
-        interval(1000 * 60).subscribe(async () => {
-            await this.fetchItems();
-            this.checkItemsDue();
-        });
-
-        this.pendingActions.subscribe(updates => {
-            if (updates) {
-                this.performActionLocally(updates)
-            }
-        });
 
         this._user
             .getUser$()
             .pipe(filter(i => i !== undefined))
             .subscribe(() => this.fetchItems())
 
-
-        this.itemsSub
-            .pipe(
-                filter(i => i !== undefined && i.length > 0),
-                distinctUntilChanged())
-            .subscribe(async _ => {
-                localStorage.setItem('items', JSON.stringify(this.itemsSub.getValue()));
+        this.serverItemsSub
+            .subscribe(async value => {
+                localStorage.setItem('items', JSON.stringify(value));
             });
 
-        this.itemsSub
+        this.userModsSub
             .pipe(
                 throttleTime(2000),
                 filter(i => i !== undefined && i.length > 0),
                 distinctUntilChanged()
             )
-            .subscribe(async _ => {
-                await this.fetchItems();
-                await this.set(this.itemsSub.getValue());
+            .subscribe(async updates => {
+                await this.update(updates);
             });
     }
 
@@ -84,22 +72,6 @@ export class ApplicationState {
         return this._user;
     }
 
-    private performActionLocally(delta: Partial<Todo>) {
-        if (!delta) return;
-        const currentItems = this.itemsSub.getValue() ?? [];
-        const existingItem = currentItems.find(i => i.id === delta.id);
-        const isAdd = existingItem === undefined;
-        if (isAdd) {
-            this.itemsSub.next([...currentItems, { ...delta, last_updated: Date.now().toString() }]);
-        } else {
-            this.itemsSub.next(currentItems.map(i => {
-                if (i.id === delta.id) {
-                    return ({ ...i, ...delta, last_updated: Date.now().toString() });
-                }
-                return i;
-            }));
-        }
-    }
 
     clearLocal(){
         localStorage.removeItem('items');
@@ -107,7 +79,7 @@ export class ApplicationState {
     }
 
     checkItemsDue() {
-        this.itemsSub
+        this.serverItemsSub
             .getValue()
             .filter(i => !i.completed && Date.now() > Date.parse(i.due ?? "") && !this.notifiedItems.getValue().has(i.id?.toString() ?? ""))
             .forEach(i => {
@@ -126,9 +98,10 @@ export class ApplicationState {
     }
 
     getItems$() {
-        return combineLatest([this.itemsSub, this._filter.getFilter$(), this._filter.getToday$()])
+        return combineLatest([this.serverItemsSub, this.userModsSub, this._filter.getFilter$(), this._filter.getToday$()])
             .pipe(
-                map(([items, filterOp, today]) => {
+                map(([serverItems, userMods, filterOp, today]) => {
+                    const items = reconcile(serverItems, userMods);
                     const filterByToday = (item: Partial<Todo>) => {
                         if (today) {
                             const today_1 = new Date();
@@ -147,8 +120,7 @@ export class ApplicationState {
                         case "open":
                             return items.filter(i => !i.completed && filterByToday(i));
                     }
-                }),
-                map(_ => _.filter(i => !i.is_deleted))
+                })
             )
     }
 
@@ -172,7 +144,7 @@ export class ApplicationState {
         });
         const result = await r.json();
 
-        this.itemsSub.next(reconcile(result, this.itemsSub.getValue()));
+        this.serverItemsSub.next(result);
         this.isLoadingSub.next(false);
     }
 
@@ -180,24 +152,19 @@ export class ApplicationState {
     addItem(description: string) {
         const due = new Date();
         due.setDate(new Date().getDate() + 1)
-        this.pendingActions.next({
-            description,
-            id: Date.now(),
-            added_on: Date.now().toString(),
-            completed: false,
-            user_id: this._user.getUser()?.email,
-            due: due.toString()
-        });
+        this.userModsSub.next([...this.userModsSub.getValue(), {id: Date.now(), action: "Add", data: { description, id: Date.now(), added_on: Date.now().toString(), completed: false, user_id: this._user.getUser()?.email ?? "", due: due.toString() }}]);
     }
 
 
     deleteItem(id: number) {
-        this.pendingActions.next({ id, is_deleted: true });
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === id), {id: id, action: "Remove"}]);
     }
 
 
     toggleStatus(value: boolean, id: number) {
-        this.pendingActions.next({ id, completed: !value });
+        const existingItem = this.serverItemsSub.getValue().find(i => i.id === id);
+        if (existingItem === undefined) return;
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === id), {id: id, action: "Update", data : {...existingItem, completed: !value}}]);
     }
 
     refresh() {
@@ -205,48 +172,77 @@ export class ApplicationState {
     }
 
     updateItem(item: Todo) {
-        this.pendingActions.next({ ...item });
+
+        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id === item.id), {id: item.id, action: "Update", data : item}]);
     }
 
-    private async set(items: Partial<Todo>[]) {
-        const r = await fetch(this.baseUrl + `/api/set`, {
+    private async update(items: TodoUpdate[]) {
+        this.isLoadingSub.next(true);
+        const r = await fetch(this.baseUrl + `/api/update`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json',
                 'user': this._user.getUser()?.email || ""
             },
-            body: `"${JSON.stringify(items, null, "").replace(/\"/g, "\\\"")}"`
+            body: JSON.stringify(items)
         });
-        const result = await r.text();
+        const result = await r.json();
+        //remove ONLY processed items. since new items may have been added whilst syncing
+        this.userModsSub.next(this.userModsSub.getValue().filter(i => items.find(l => JSON.stringify(l) === JSON.stringify(i)) === undefined));
+        this.serverItemsSub.next(result);
+        this.isLoadingSub.next(false);
     }
 
     logout() {
         this._user.setUser(undefined);
-        this.itemsSub.next([]);
+        this.serverItemsSub.next([]);
+        this.userModsSub.next([]);
         this._filter.setFilter("open")
     }
 
 }
 
-export function reconcile(oldItems: Todo[], newItems: Partial<Todo>[]): Partial<Todo>[] {
-    const allItems = [...newItems, ...oldItems]
-        .sort((a, b) => {
-            const dateA = a.last_updated ?? a.added_on ?? "";
-            const dateB = b.last_updated ?? b.added_on ?? "";
-            return dateB.localeCompare(dateA);
-        });
-    const uniqueItems = _uniqWith(allItems, (a, b) => a.id === b.id);
-    return uniqueItems;
+export function reconcile(serverItems: Todo[], userMod: TodoUpdate[]): Todo[] {
+    return serverItems
+        //Remove    
+        .filter(_ => userMod.find(i => i.id === _.id && i.action === "Remove") === undefined) 
+        //Update
+        .map(_ => {
+            const update = userMod.find(i => i.id === _.id);
+            if (update?.action == "Update" && update) {
+                return update.data;
+            }
+            return _;
+        })
+        //Add
+        .concat(userMod.filter(i => i.action === "Add").map(i => i.data))
 }
 
 export type Todo = {
     id: number;
     description: string;
     completed: boolean;
-    is_deleted?: boolean;
     due?: string;
     added_on: string;
     detail?: string;
     user_id: string;
     last_updated?: string;
+}
+
+export type TodoUpdate = TodoUpdateAction | TodoAddAction | TodoRemoveAction;
+
+export type TodoUpdateAction = {
+    id: number;
+    action : "Update",
+    data: Todo;
+}
+
+export type TodoAddAction = {
+    id: number;
+    action : "Add",
+    data: Todo;
+}
+export type TodoRemoveAction = {
+    id: number;
+    action : "Remove"
 }
