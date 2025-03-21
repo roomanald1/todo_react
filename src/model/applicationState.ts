@@ -4,7 +4,7 @@ import _uniqWith from "lodash/uniqWith";
 import { FilterModel } from "./filterModel";
 import { UserModel } from "./userModel";
 
-export const isLocal = true;
+export const isLocal = false;
 
 export class ApplicationState {
 
