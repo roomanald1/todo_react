@@ -1,28 +1,52 @@
 import { BehaviorSubject } from "rxjs";
 
 export type FilterOp = "all" | "completed" | "open";
-
+const ticksInOneDay = 24 * 60 * 60 * 1000; // 86,400,000 ms
 export class FilterModel {
-    getToday$() {
-        return this.todaySub.asObservable();
+
+    getDuration$(){
+        return this.durationSub.asObservable();
     }
 
-    toggleToday() {
-        this.todaySub.next(!this.todaySub.getValue());
+    setDurationToToday() {
+        this.durationSub.next({from: 0,to: ticksInOneDay});
     }
 
-    getFilter() {
+    setDurationToThisWeek(){
+        this.durationSub.next({from: 0,to: ticksInOneDay*7});
+    }
+
+    setDurationToRestOfWeek(){
+        this.durationSub.next({from: ticksInOneDay,to: ticksInOneDay*7});
+    }
+
+    setDurationToNextWeek(){
+        this.durationSub.next({from: ticksInOneDay *7,to: ticksInOneDay *14});
+    }
+
+    setDurationToNextWeekOnwards(){
+        this.durationSub.next({from: ticksInOneDay *7,to: ticksInOneDay *365});
+    }
+
+    setDurationToThisMonth(){
+        this.durationSub.next({from: 0,to: ticksInOneDay*30});
+    }
+
+    setDurationToNextMonth(){
+        this.durationSub.next({from: ticksInOneDay *30,to: ticksInOneDay*60});
+    }
+
+    getStatusFilter() {
         return this.filterSub.getValue();
     }
-    getFilter$() {
+    getStatusFilter$() {
         return this.filterSub.asObservable();
     }
 
-    setFilter(v: FilterOp) {
+    setStatusFilter(v: FilterOp) {
         this.filterSub.next(v);
     }
 
-    private todaySub = new BehaviorSubject<boolean>(true);
-
+    private durationSub = new BehaviorSubject<{from:number, to:number}>({from: 0,to: ticksInOneDay});
     private filterSub = new BehaviorSubject<FilterOp>("open");
 }

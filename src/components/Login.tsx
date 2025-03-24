@@ -1,11 +1,11 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { useContext } from "react";
-import { ApplicationContext } from "./ApplicationContext";
+import { UserContext } from "./ApplicationContext";
 import axios from "axios";
 
 export const Login = () => {
 
-    const appContext = useContext(ApplicationContext);
+    const appContext = useContext(UserContext);
     const login = useGoogleLogin({
         onSuccess: async credentialResponse => {
             console.log(credentialResponse);
@@ -16,7 +16,7 @@ export const Login = () => {
             );
 
             console.log(userInfo);
-            appContext?.user().setUser(userInfo.data)
+            appContext?.setUser(userInfo.data)
         },
         onError: errorResponse => console.log(errorResponse),
     });

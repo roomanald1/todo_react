@@ -1,17 +1,15 @@
 import { useContext, useMemo, useState } from "react";
-import { FaRedo, FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Item } from "./Item";
-import { ApplicationContext } from "./ApplicationContext";
+import { ApplicationContext, FilterContext } from "./ApplicationContext";
 import { useObservable } from "../utils/useObservable";
 
 
 export const Items = () => {
-
     const appContext = useContext(ApplicationContext);
+    const filterContext = useContext(FilterContext);
 
-    const isLoading = useObservable(() => appContext?.getIsLoading$());
-
-    const items = useObservable(() => appContext?.getItems$());
+    const items = useObservable(() => filterContext && appContext?.getFilteredItems$(filterContext));
 
     const [sortBy, setSortBy] = useState<string | null>("due");
 
@@ -29,20 +27,13 @@ export const Items = () => {
         return items;
     }, [items, sortBy]);
 
-    const errors = useObservable(() => appContext?.getErrors$());
-
     return (
         <>
-            {errors && <span>{errors}</span>}
-            <div style={{ display: "flex", marginBottom: 10 }}>
-                <div style={{ flex: 1 }} />
-                <button onClick={() => appContext?.refresh()}><FaRedo className={isLoading ? "spin" : ""} /></button>
-            </div>
             <div style={{ flex: 1, overflow: "auto" }}>
                 <table>
                     <thead>
                         <tr>
-                            <th style={{ width: "15%", overflow: "auto" }}>Done</th>
+                            <th style={{ width: "15%", overflow: "auto" }}></th>
                             <th style={{ width: "55%", overflow: "auto" }}>Description</th>
                             <th style={{ width: "28%", overflow: "auto" }}>Due 
                                 <button onClick={() => setSortBy(current => current === "due" ? "due_asc" : "due")}>
@@ -54,7 +45,7 @@ export const Items = () => {
                                     }
                                 </button>
                             </th>
-                            <th style={{ width: "23px", overflow: "auto" }}></th>
+                            <th style={{ width: "18px", overflow: "auto" }}></th>
                         </tr>
                     </thead>
                     <tbody>

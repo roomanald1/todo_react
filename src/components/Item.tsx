@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { FaCheck, FaCircle } from "react-icons/fa";
+import { FaCheck,  FaRegSquare } from "react-icons/fa";
 import { ApplicationContext } from "./ApplicationContext";
 import React from "react";
 import {  map } from "rxjs";
@@ -43,16 +43,16 @@ export const Item = (props: { item: any; }) => {
         <tr onDoubleClick={onExpand} className={className} key={props.item.id}>
             <td style={{ width: "15%", overflow: "auto" }}>
                 <button onClick={onToggleStatus}>
-                    {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaCircle style={{ color: "lightblue" }} />}
+                    {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaRegSquare  />}
                 </button>
             </td>
-            <td style={{ width: "65%", placeContent:"baseline", height: expand ? "200px" : "auto" , cursor: "pointer", overflow: "auto" }}>
+            <td style={{ width: "75%", placeContent:"baseline", height: expand ? "200px" : "auto" , cursor: "pointer", overflow: "auto" }}>
                 <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
                     <span>{props.item.description}</span>
                     {expand && <ItemDetail item={props.item} onDone={onDone}/>}
                 </div>
              </td>
-            <td style={{ width: "25%", overflow: "auto" }}>
+            <td style={{ width: "15%", overflow: "auto", fontSize: "0.7em" }}>
                 <div style={{display: "flex", flexDirection: "column",width: "100%", height: "100%"}}>
                     <span>{moment(props.item.due).fromNow()}</span>
                     {expand && <DueDetail onDone={onDone} item={props.item}/>}

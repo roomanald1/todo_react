@@ -3,6 +3,7 @@ import { showNotification } from "../utils/notifications";
 import _uniqWith from "lodash/uniqWith";
 import { FilterModel } from "./filterModel";
 import { UserModel } from "./userModel";
+import { parse } from "date-fns";
 
 export const isLocal = false;
 
@@ -19,19 +20,9 @@ export class ApplicationState {
     private userModsSub = new BehaviorSubject<TodoUpdate[]>([]);
 
     private isLoadingSub = new BehaviorSubject<boolean>(false);
-
-    private _filter = new FilterModel();
-    private _user = new UserModel();
     private errors = new BehaviorSubject<string | undefined>(undefined);
 
-    constructor() {
-
-        try {
-            this.serverItemsSub.next(JSON.parse(localStorage.getItem('items') ?? ""));
-            this.userModsSub.next(JSON.parse(localStorage.getItem('user_mods') ?? ""));
-        } catch (e) {
-            console.log(e);
-        }
+    constructor(private _user: UserModel) {
 
         //fetch items every 20 seconds
         interval(1000 * 20)
@@ -45,12 +36,16 @@ export class ApplicationState {
         this._user
             .getUser$()
             .pipe(filter(i => i !== undefined))
-            .subscribe(() => this.fetchItems())
-
-        this.serverItemsSub
-            .subscribe(async value => {
-                localStorage.setItem('items', JSON.stringify(value));
-            });
+            .subscribe(() => {
+                try {
+                    if (localStorage.getItem('items')) this.serverItemsSub.next(JSON.parse(localStorage.getItem('items') ?? ""));
+                    if (localStorage.getItem('user_mods')) this.userModsSub.next(JSON.parse(localStorage.getItem('user_mods') ?? ""));
+                    if (localStorage.getItem('notified_items')) this.notifiedItems.next(new Set<string>(JSON.parse(localStorage.getItem('notified_items') ?? "")));
+                } catch (e) {
+                    console.log(e);
+                }
+                this.fetchItems()
+            })
 
         this.userModsSub
             .pipe(
@@ -63,15 +58,9 @@ export class ApplicationState {
             });
     }
 
-
-    filter(): FilterModel {
-        return this._filter;
-    }
-
     user(): UserModel {
         return this._user;
     }
-
 
     clearLocal(){
         localStorage.removeItem('items');
@@ -79,17 +68,19 @@ export class ApplicationState {
     }
 
     checkItemsDue() {
+        if (this._user.getUser() === undefined) return;
         this.serverItemsSub
             .getValue()
             .filter(i => !i.completed && Date.now() > Date.parse(i.due ?? "") && !this.notifiedItems.getValue().has(i.id?.toString() ?? ""))
             .forEach(i => {
                 try {
-                    showNotification(`Item due: ${i.description} ${i.due}`);
+                    showNotification(`Due: ${i.description} ${i.due}`);
                 } catch (e) {
                     this.errors.next(e?.toString())
                     console.log(e)
                 }
                 this.notifiedItems.next(this.notifiedItems.getValue().add(i.id?.toString() ?? ""));
+                localStorage.setItem('notified_items', JSON.stringify(Array.from(this.notifiedItems.getValue())));
             })
     }
 
@@ -97,16 +88,15 @@ export class ApplicationState {
         return this.isLoadingSub.asObservable();
     }
 
-    getItems$() {
-        return combineLatest([this.serverItemsSub, this.userModsSub, this._filter.getFilter$(), this._filter.getToday$()])
+    getFilteredItems$(filterModel: FilterModel) {
+        return combineLatest([this.serverItemsSub, this.userModsSub, filterModel.getStatusFilter$(), filterModel.getDuration$()])
             .pipe(
-                map(([serverItems, userMods, filterOp, today]) => {
+                map(([serverItems, userMods, filterOp, duration]) => {
                     const items = reconcile(serverItems, userMods);
                     const filterByToday = (item: Partial<Todo>) => {
-                        if (today) {
-                            const today_1 = new Date();
-                            today_1.setDate(new Date().getDate() + 1)
-                            return Date.parse(item.due ?? "") < today_1.getTime()
+                        if (duration) {
+                            const due = Date.parse(item.due ?? "") - Date.now()
+                            return due < duration.to && (duration.from == 0 ? true : due > duration.from);
                         } else {
                             return true;
                         }
@@ -143,7 +133,7 @@ export class ApplicationState {
             }
         });
         const result = await r.json();
-
+        localStorage.setItem('items', JSON.stringify(result));
         this.serverItemsSub.next(result);
         this.isLoadingSub.next(false);
     }
@@ -178,7 +168,6 @@ export class ApplicationState {
 
     private async update(items: TodoUpdate[]) {
         this.isLoadingSub.next(true);
-        const modsBefore= this.userModsSub.getValue();
         const r = await fetch(this.baseUrl + `/api/update`, {
             method: "PUT",
             headers: {
@@ -198,7 +187,6 @@ export class ApplicationState {
         this._user.setUser(undefined);
         this.serverItemsSub.next([]);
         this.userModsSub.next([]);
-        this._filter.setFilter("open")
     } 
 
 }
