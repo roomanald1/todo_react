@@ -8,6 +8,7 @@ import { Items } from "./Items";
 import React from "react";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { delay } from "lodash";
 
 
 function detectMob() {
@@ -31,7 +32,7 @@ export const App = () => {
     return (
         <div style={{display: "flex", flexDirection: "column", height: "100%", padding: 10, boxSizing: "border-box"}}> 
             <Header/>
-            <DndProvider backend={detectMob() ? TouchBackend : HTML5Backend}>
+            <DndProvider backend={detectMob() ? TouchBackend : HTML5Backend} options={{delayTouchStart: 1000}}>
                 <div style={{display: "flex", flexDirection: "column", flex: 1, overflow: "auto"}}>
                     <TodaysItemsView/>
                     <div style={{display: "flex", flexDirection: "row"}}>
