@@ -9,12 +9,29 @@ import React from "react";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+
+function detectMob() {
+    const toMatch = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+    
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+}
+
 export const App = () => {
 
     return (
         <div style={{display: "flex", flexDirection: "column", height: "100%", padding: 10, boxSizing: "border-box"}}> 
             <Header/>
-            <DndProvider backend={HTML5Backend}>
+            <DndProvider backend={detectMob() ? TouchBackend : HTML5Backend}>
                 <div style={{display: "flex", flexDirection: "column", flex: 1, overflow: "auto"}}>
                     <TodaysItemsView/>
                     <div style={{display: "flex", flexDirection: "row"}}>
