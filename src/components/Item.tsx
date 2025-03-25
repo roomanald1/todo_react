@@ -2,16 +2,16 @@ import { useContext, useState } from "react";
 import { FaCheck,  FaRegSquare } from "react-icons/fa";
 import { ApplicationContext } from "./ApplicationContext";
 import React from "react";
-import {  map } from "rxjs";
-import { useObservable } from "../utils/useObservable";
 import moment from "moment";
 import { Todo } from "src/model/applicationState";
+import { useDrag } from "react-dnd";
+import { isValid } from "date-fns";
 
-export const Item = (props: { item: any; }) => {
+export const Item = (props: { item: Todo; }) => {
     const [expand, setExpand] = React.useState<boolean>();
     const appContext = useContext(ApplicationContext);
 
-    const isDue = useObservable(() => appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id))));
+    const isDue = false;//useObservable(() => appContext?.getNotifiedMessages$().pipe(map(_ => _.has(props.item.id.toString()))));
 
     const onRemove = () => {
         if (window.confirm("Are you sure you want to remove this item?")) {
@@ -39,8 +39,23 @@ export const Item = (props: { item: any; }) => {
         e.currentTarget.scrollIntoView()
     }
 
+    const [collected, drag, dragPreview] = useDrag(() => {
+        return {
+            type: "item",
+            item: props.item,
+            end: (item, monitor) => {
+                if (monitor.didDrop()) {
+                    const offset = monitor.getDropResult() as {value: number};
+                    const due = new Date(Number(offset.value) + Date.now());
+                    if (!isValid(due)) return;
+                    appContext?.updateItem({...item, due: due.toISOString()});
+                }
+            }
+        }
+    });
+
     return (
-        <tr onDoubleClick={onExpand} className={className} key={props.item.id}>
+        <tr ref={drag}  {...collected as any} onDoubleClick={onExpand} className={className} key={props.item.id}>
             <td style={{ width: "15%", overflow: "auto" }}>
                 <button onClick={onToggleStatus}>
                     {props.item.completed === true ? <FaCheck style={{ color: "green" }} /> : <FaRegSquare  />}

@@ -6,7 +6,6 @@
         "start": "webpack serve --mode development",
         "build": "yarn install && webpack build --mode production",
         "test": "jest"
-
     },
     "dependencies": {
         "@react-oauth/google": "^0.12.1",
@@ -19,6 +18,9 @@
         "lodash": "^4.17.21",
         "moment": "^2.30.1",
         "react": "^19.0.0",
+        "react-dnd": "^16.0.1",
+        "react-dnd-html5-backend": "^16.0.1",
+        "react-dnd-touch-backend": "^16.0.1",
         "react-dom": "^19.0.0",
         "react-icons": "^5.5.0",
         "react-spinners": "^0.15.0",

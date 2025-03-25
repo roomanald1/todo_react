@@ -49,7 +49,7 @@ export class ApplicationState {
 
         this.userModsSub
             .pipe(
-                throttleTime(2000, undefined, {trailing: true, leading: false}),
+                throttleTime(1000, undefined, {trailing: true, leading: false}),
                 filter(i => i !== undefined && i.length > 0),
                 distinctUntilChanged()
             )
@@ -154,7 +154,8 @@ export class ApplicationState {
     toggleStatus(value: boolean, id: number) {
         const existingItem = this.serverItemsSub.getValue().find(i => i.id === id);
         if (existingItem === undefined) return;
-        this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id !== id), {id: id, action: "Update", data : {...existingItem, completed: !value}}]);
+
+        this.updateItem({...existingItem, completed: !value});
     }
 
     refresh() {
@@ -162,8 +163,14 @@ export class ApplicationState {
     }
 
     updateItem(item: Todo) {
-
+        this.removeNotificationsForItem(item.id);
         this.userModsSub.next([...this.userModsSub.getValue().filter(_ => _.id !== item.id), {id: item.id, action: "Update", data : item}]);
+    }
+
+    private removeNotificationsForItem(id: number) {
+        const notifications = this.notifiedItems.getValue();
+        notifications.delete(id?.toString() ?? "");
+        this.notifiedItems.next(notifications);
     }
 
     private async update(items: TodoUpdate[]) {
@@ -187,6 +194,7 @@ export class ApplicationState {
         this._user.setUser(undefined);
         this.serverItemsSub.next([]);
         this.userModsSub.next([]);
+        this.clearLocal();
     } 
 
 }

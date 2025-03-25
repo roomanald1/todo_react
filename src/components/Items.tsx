@@ -3,6 +3,8 @@ import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Item } from "./Item";
 import { ApplicationContext, FilterContext } from "./ApplicationContext";
 import { useObservable } from "../utils/useObservable";
+import { useDrop } from "react-dnd";
+import { Duration } from "../model/filterModel";
 
 
 export const Items = () => {
@@ -27,9 +29,14 @@ export const Items = () => {
         return items;
     }, [items, sortBy]);
 
+    const [_, drop] = useDrop(()=> ({accept: "item", drop: (item: any) => {
+        const duration = (filterContext?.getDuration().to ?? 0) - Duration.ticksInOneHour;
+        return ({value: duration});
+    }}));
+
     return (
         <>
-            <div style={{ flex: 1, overflow: "auto" }}>
+            <div ref={drop as any} style={{ flex: 1, overflow: "auto" }}>
                 <table>
                     <thead>
                         <tr>

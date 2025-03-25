@@ -1,39 +1,32 @@
 import { BehaviorSubject } from "rxjs";
 
 export type FilterOp = "all" | "completed" | "open";
-const ticksInOneDay = 24 * 60 * 60 * 1000; // 86,400,000 ms
+
+export class Duration {
+    static ticksInOneHour = 60 * 60 * 1000; // 3,600,000 ms
+    static ticksInOneMinute = 60 * 1000; // 60,000 ms
+    static ticksInOneDay = 24 * 60 * 60 * 1000; // 86,400,000 ms
+    static today = {from: 0,to: Duration.ticksInOneDay};
+    static thisWeek = {from: 0,to: Duration.ticksInOneDay*7};
+    static restOfWeek = {from: Duration.ticksInOneDay,to: Duration.ticksInOneDay*7};
+    static nextWeek = {from: Duration.ticksInOneDay *7,to: Duration.ticksInOneDay *14};
+    static nextWeekOnwards = {from: Duration.ticksInOneDay *7,to: Duration.ticksInOneDay *365};
+    static thisMonth = {from: 0,to: Duration.ticksInOneDay*30};
+    static nextMonth = {from: Duration.ticksInOneDay *30,to: Duration.ticksInOneDay*60};
+}
+
 export class FilterModel {
 
     getDuration$(){
         return this.durationSub.asObservable();
     }
 
-    setDurationToToday() {
-        this.durationSub.next({from: 0,to: ticksInOneDay});
+    getDuration(){
+        return this.durationSub.getValue();
     }
 
-    setDurationToThisWeek(){
-        this.durationSub.next({from: 0,to: ticksInOneDay*7});
-    }
-
-    setDurationToRestOfWeek(){
-        this.durationSub.next({from: ticksInOneDay,to: ticksInOneDay*7});
-    }
-
-    setDurationToNextWeek(){
-        this.durationSub.next({from: ticksInOneDay *7,to: ticksInOneDay *14});
-    }
-
-    setDurationToNextWeekOnwards(){
-        this.durationSub.next({from: ticksInOneDay *7,to: ticksInOneDay *365});
-    }
-
-    setDurationToThisMonth(){
-        this.durationSub.next({from: 0,to: ticksInOneDay*30});
-    }
-
-    setDurationToNextMonth(){
-        this.durationSub.next({from: ticksInOneDay *30,to: ticksInOneDay*60});
+    setDuration(duration: {from:number, to:number}){
+        this.durationSub.next(duration);
     }
 
     getStatusFilter() {
@@ -47,6 +40,6 @@ export class FilterModel {
         this.filterSub.next(v);
     }
 
-    private durationSub = new BehaviorSubject<{from:number, to:number}>({from: 0,to: ticksInOneDay});
+    private durationSub = new BehaviorSubject<{from:number, to:number}>(Duration.today);
     private filterSub = new BehaviorSubject<FilterOp>("open");
 }
