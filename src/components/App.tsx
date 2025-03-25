@@ -9,6 +9,7 @@ import React from "react";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { delay } from "lodash";
+import { Preview } from "react-dnd-preview";
 
 
 function detectMob() {
@@ -29,6 +30,9 @@ function detectMob() {
 
 export const App = () => {
 
+    const generatePreview = (props: {itemType: any, item: any, style: any}) => {
+        return <div className="item-list__item" style={props.style}>{props.itemType}</div>
+    }
     return (
         <div style={{display: "flex", flexDirection: "column", height: "100%", padding: 10, boxSizing: "border-box"}}> 
             <Header/>
@@ -49,6 +53,7 @@ export const App = () => {
                     <h3>Add New Item</h3>
                     <Add/>
                 </div>
+                <Preview generator={generatePreview}/> 
             </DndProvider>
         </div>
         )
